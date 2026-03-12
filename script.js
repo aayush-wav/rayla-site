@@ -270,6 +270,7 @@ document.addEventListener("DOMContentLoaded", () => {
 					});
 				}
 			} catch (err) {
+				console.error("Availability Fetch Error:", err);
 				timeSelect.innerHTML = '<option value="" disabled selected>Could not load slots</option>';
 			}
 		});
