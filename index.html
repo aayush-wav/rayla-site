@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nails by Rayla | Luxury Nail Salon</title>
+    <meta name="description" content="Experience luxury nail care at Nails by Rayla. Offering premium manicures, pedicures, gel nails, acrylics, and custom nail art in a relaxing, elegant environment.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="images/logo.png">
+</head>
+<body>
+    <!-- Particle Cursor Canvas -->
+    <canvas id="cursor-canvas"></canvas>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">
+            <a href="#home">
+                <img src="images/logo.png" alt="Rayla Logo">
+                Rayla
+            </a>
+        </div>
+        <div class="nav-links">
+            <a href="#services">Services</a>
+            <a href="#courses">Courses</a>
+            <a href="#gallery">Gallery</a>
+            <a href="#instagram">Instagram</a>
+            <a href="#location">Visit</a>
+            <a href="#about">About</a>
+        </div>
+        <div class="nav-cta desktop-cta">
+            <a href="#booking" class="btn btn-outline">Book Now</a>
+        </div>
+        <div class="mobile-controls">
+            <a href="#booking" class="btn btn-primary btn-sm mobile-cta">Book Now</a>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero" id="home">
+        <div class="hero-content">
+            <h1 class="typewriter-container" aria-label="Chic Nails, Effortless Style.">
+                <span id="typewriter-text"></span><span class="typewriter-cursor"></span>
+            </h1>
+        </div>
+    </header>
+
+    <!-- Background Decor for Glassmorphism -->
+    <div class="bg-blob blob-1"></div>
+    <div class="bg-blob blob-2"></div>
+    <div class="bg-blob blob-3"></div>
+
+    <!-- Services Section -->
+    <section class="services menu-section" id="services">
+        <div class="container section-header fade-in-up">
+            <h2>Our Services</h2>
+            <p>Indulge in our curated selection of premium treatments</p>
+        </div>
+        
+        <div class="container menu-grid">
+            <!-- Nail Extensions -->
+            <div class="menu-category fade-in-up">
+                <h3>Nail Extensions</h3>
+                <ul class="menu-list">
+                    <li><span class="item-name">Gel</span><span class="item-separator"></span><span class="item-price">NPR 1500</span></li>
+                    <li><span class="item-name">GelX</span><span class="item-separator"></span><span class="item-price">NPR 1400</span></li>
+                    <li><span class="item-name">Acrylic</span><span class="item-separator"></span><span class="item-price">NPR 1800</span></li>
+                    <li><span class="item-name">Polygel</span><span class="item-separator"></span><span class="item-price">NPR 1500</span></li>
+                    <li><span class="item-name">Overlay</span><span class="item-separator"></span><span class="item-price">NPR 1000</span></li>
+                    <li><span class="item-name">Color Only</span><span class="item-separator"></span><span class="item-price">NPR 800</span></li>
+                </ul>
+            </div>
+
+            <!-- Lash Extensions -->
+            <div class="menu-category fade-in-up" style="transition-delay: 0.1s">
+                <h3>Lash Extensions</h3>
+                <ul class="menu-list">
+                    <li><span class="item-name">Classic Lashes</span><span class="item-separator"></span><span class="item-price">NPR 1500</span></li>
+                    <li><span class="item-name">Cateye Lashes</span><span class="item-separator"></span><span class="item-price">NPR 1800</span></li>
+                    <li><span class="item-name">Wispy Lashes</span><span class="item-separator"></span><span class="item-price">NPR 2000</span></li>
+                    <li><span class="item-name">Lashes Lift</span><span class="item-separator"></span><span class="item-price">NPR 1500</span></li>
+                </ul>
+            </div>
+
+            <!-- Removal -->
+            <div class="menu-category fade-in-up" style="transition-delay: 0.2s">
+                <h3>Removal</h3>
+                <ul class="menu-list">
+                    <li><span class="item-name">Nail Extension Removal</span><span class="item-separator"></span><span class="item-price">NPR 500</span></li>
+                    <li><span class="item-name">Lash Extension Removal</span><span class="item-separator"></span><span class="item-price">NPR 700</span></li>
+                </ul>
+            </div>
+
+            <!-- Nail Art -->
+            <div class="menu-category fade-in-up" style="transition-delay: 0.3s">
+                <h3>Nail Art</h3>
+                <ul class="menu-list">
+                    <li><span class="item-name">French</span><span class="item-separator"></span><span class="item-price">NPR 30</span></li>
+                    <li><span class="item-name">Cateye / Chrome / Swirls / Ombre</span><span class="item-separator"></span><span class="item-price">NPR 40-50</span></li>
+                    <li><span class="item-name">Blooming / In Glitter</span><span class="item-separator"></span><span class="item-price">NPR 45-50</span></li>
+                    <li><span class="item-name">3D Chrome / Metal Chrome / Line Marble</span><span class="item-separator"></span><span class="item-price">NPR 50</span></li>
+                    <li><span class="item-name">Bow, Aura Nails, Fire / Zebra</span><span class="item-separator"></span><span class="item-price">NPR 50</span></li>
+                    <li><span class="item-name">Animal Print</span><span class="item-separator"></span><span class="item-price">NPR 30</span></li>
+                    <li><span class="item-name">Heart</span><span class="item-separator"></span><span class="item-price">NPR 20</span></li>
+                    <li><span class="item-name">Stone (Small)</span><span class="item-separator"></span><span class="item-price">NPR 5</span></li>
+                    <li><span class="item-name">Stone (Big)</span><span class="item-separator"></span><span class="item-price">NPR 10</span></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Courses Section -->
+    <section class="courses menu-section" id="courses">
+        <div class="container section-header fade-in-up">
+            <h2>Our Courses</h2>
+            <p>Elevate your skills with our professional training programs</p>
+        </div>
+        
+        <div class="container menu-grid">
+            <!-- Nail Courses -->
+            <div class="menu-category fade-in-up">
+                <h3>Nail Courses</h3>
+                <ul class="menu-list">
+                    <li><span class="item-name">Basic</span><span class="item-separator"></span><span class="item-price">NPR 10,000</span></li>
+                    <li><span class="item-name">Advanced</span><span class="item-separator"></span><span class="item-price">NPR 18,000</span></li>
+                    <li><span class="item-name">Professional</span><span class="item-separator"></span><span class="item-price">NPR 33,000</span></li>
+                    <li><span class="item-name">Master</span><span class="item-separator"></span><span class="item-price">NPR 55,000</span></li>
+                </ul>
+            </div>
+
+            <!-- Lash Courses -->
+            <div class="menu-category fade-in-up" style="transition-delay: 0.1s">
+                <h3>Lash Courses</h3>
+                <ul class="menu-list">
+                    <li><span class="item-name">Basic</span><span class="item-separator"></span><span class="item-price">NPR 5,000</span></li>
+                    <li><span class="item-name">Advanced</span><span class="item-separator"></span><span class="item-price">NPR 8,000</span></li>
+                    <li><span class="item-name">Professional</span><span class="item-separator"></span><span class="item-price">NPR 16,000</span></li>
+                    <li><span class="item-name">Master</span><span class="item-separator"></span><span class="item-price">NPR 20,000</span></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section class="gallery" id="gallery">
+        <div class="container section-header fade-in-up">
+            <h2>Our Artistry</h2>
+            <p>A glimpse into our crafted perfection</p>
+        </div>
+        
+        <div class="gallery-grid container">
+            <div class="gallery-item fade-in-up">
+                <img id="img-gallery-3" src="images/artistry_red_stiletto.png" alt="Red stiletto nails">
+                <div class="gallery-overlay">
+                    <span>Vampire Stiletto</span>
+                </div>
+            </div>
+            <div class="gallery-item fade-in-up" style="transition-delay: 0.1s">
+                <img id="img-gallery-4" src="images/artistry_blue_floral.png" alt="Blue-grey floral nail art">
+                <div class="gallery-overlay">
+                    <span>Blue Floral</span>
+                </div>
+            </div>
+            <div class="gallery-item fade-in-up" style="transition-delay: 0.2s">
+                <img id="img-gallery-5" src="images/artistry_purple_floral.png" alt="White and purple floral nail art">
+                <div class="gallery-overlay">
+                    <span>Purple Floral</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="about" id="about">
+        <div class="container about-grid">
+            <div class="about-image fade-in-up">
+                <img id="img-team" src="images/team.jpg" alt="The Nails by Rayla Team">
+            </div>
+            <div class="about-content fade-in-up" style="transition-delay: 0.2s">
+                <h2>Meet Our Team</h2>
+                <p>At Nails by Rayla, we are more than just a salon—we are a family of dedicated artists who love what we do. Our team is committed to making you feel comfortable, pampered, and truly at home from the moment you walk through our doors.</p>
+                <p>We believe that beauty is an experience to be shared. Whether you're here for a subtle refresh or a bold new look, we're here to bring your vision to life with warmth, care, and a smile. We can't wait to welcome you into our sanctuary.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Reviews Section -->
+    <section class="reviews" id="reviews">
+        <div class="container section-header fade-in-up">
+            <h2>Client Testimonials</h2>
+            <p>What our esteemed guests say about their Nails by Rayla experience</p>
+        </div>
+        <div class="container reviews-grid">
+            <div class="review-card fade-in-up">
+                <div class="stars">★★★★★</div>
+                <p>"Very skilled and friendly artists! My nails turned out exactly as I wanted. Truly comfortable experience."</p>
+                <div class="reviewer">- Supriya Lawati</div>
+            </div>
+            <div class="review-card fade-in-up" style="transition-delay: 0.1s">
+                <div class="stars">★★★★★</div>
+                <p>"Best nail service! Recreated my 3D inspiration perfectly. Incredibly helpful and lovely staff."</p>
+                <div class="reviewer">- Gillian Baker</div>
+            </div>
+            <div class="review-card fade-in-up" style="transition-delay: 0.2s">
+                <div class="stars">★★★★★</div>
+                <p>"Fantastic experience! Staff are super professional. My girlfriend's nails look amazing—highly recommended."</p>
+                <div class="reviewer">- Ayush Shrestha</div>
+            </div>
+            <div class="review-card fade-in-up" style="transition-delay: 0.3s">
+                <div class="stars">★★★★★</div>
+                <p>"Great experience! Detailed work and the overlay lasted 3+ weeks without lifting. Super cute space!"</p>
+                <div class="reviewer">- Yushna Maharjan</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Instagram Section -->
+    <section class="instagram-section" id="instagram">
+        <div class="container section-header fade-in-up">
+            <span class="sub-heading">Style • Everyday</span>
+            <h2>Follow Our Instagram</h2>
+            <a href="https://www.instagram.com/nailsbyrayla/" target="_blank" class="instagram-handle">@nailsbyrayla</a>
+        </div>
+        
+        <div class="instagram-container fade-in-up">
+            <div class="instagram-profile-header">
+                <a href="https://www.instagram.com/nailsbyrayla/" target="_blank" class="instagram-profile-link">
+                    <div class="instagram-icon-circle">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                    </div>
+                    <span class="instagram-name">nailsbyrayla</span>
+                </a>
+            </div>
+            
+            <div class="instagram-grid" id="instagram-api-grid">
+                <!-- Data will be injected here by script.js -->
+                <div class="loading-state">Loading your latest artistry...</div>
+            </div>
+            <div style="text-align: center; margin-top: 4rem;">
+                <a href="https://www.instagram.com/nailsbyrayla/" target="_blank" class="btn btn-outline">Explore More on Instagram</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Booking Section -->
+    <section class="booking" id="booking">
+        <div class="container booking-container fade-in-up">
+            <div class="booking-info">
+                <h2>Reserve Your Time</h2>
+                <p>Schedule your moment of tranquility. Select your preferred service and date below.</p>
+                
+                <div class="contact-details">
+                    <div class="contact-item">
+                        <strong>Location</strong>
+                        <p>Pimbahal, Lalitpur</p>
+                    </div>
+                    <div class="contact-item">
+                        <strong>Hours</strong>
+                        <p>Sun - Sat: 10:00 AM – 7:00 PM</p>
+                    </div>
+                    <div class="contact-item">
+                        <strong>Phone & Email</strong>
+                        <p>+977 9709720131<br>nailsbyrayla4@gmail.com</p>
+                    </div>
+                </div>
+            </div>
+            
+            <form id="booking-form" class="booking-form">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" required placeholder="Jane Doe">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" required placeholder="jane@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="service">Select Service / Course</label>
+                    <select id="service" name="service" required>
+                        <option value="" disabled selected>Choose an option...</option>
+                        <option value="nail-extensions">Nail Extensions</option>
+                        <option value="lash-extensions">Lash Extensions</option>
+                        <option value="removal">Removal Services</option>
+                        <option value="nail-art">Nail Art</option>
+                        <option value="courses">Professional Courses</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="date">Preferred Date</label>
+                    <input type="date" id="date" name="date" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Confirm Request</button>
+                <div id="form-message" class="form-message"></div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Location Section -->
+    <section class="location-section fade-in-up" id="location">
+        <div class="map-wrapper">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3533.3202603972527!2d85.31891237525268!3d27.67649487620026!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39eb190053d494eb%3A0x1c29d6ebe5f84fa3!2snails%20by%20rayla!5e0!3m2!1sen!2snp!4v1773314864980!5m2!1sen!2snp" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+        <div class="location-card">
+            <h3>Visit Our Studio</h3>
+            <p>Pimbahal, Lalitpur<br>Near the Pimbahal Pokhari</p>
+            <p><strong>Open Sunday - Saturday</strong><br>10:00 AM – 7:00 PM</p>
+            <a href="https://maps.app.goo.gl/wq74K7kRAntGpsJe7" target="_blank" class="btn btn-secondary">Get Directions</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-content">
+            <div class="footer-brand">
+                <h3>Rayla</h3>
+                <p>Your sanctuary for luxury nail artistry.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Explore</h4>
+                <a href="#home">Home</a>
+                <a href="#services">Services</a>
+                <a href="#courses">Courses</a>
+                <a href="#gallery">Gallery</a>
+                <a href="#instagram">Instagram</a>
+                <a href="#location">Location</a>
+                <a href="#reviews">Reviews</a>
+            </div>
+            <div class="footer-social">
+                <h4>Connect</h4>
+                <a href="https://www.instagram.com/nailsbyrayla/" target="_blank">Instagram: @nailsbyrayla</a>
+                <a href="mailto:nailsbyrayla4@gmail.com">Email: nailsbyrayla4@gmail.com</a>
+                <a href="tel:+9779709720131">Phone: +977 9709720131</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Nails by Rayla. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <a href="#home" id="back-to-top" class="back-to-top" aria-label="Back to top">
+        ↑
+    </a>
+
+    <script src="script.js"></script>
+</body>
+</html>
