@@ -385,8 +385,8 @@
 					<input type="text" id="name" name="name" required placeholder="Jane Doe" />
 				</div>
 				<div class="form-group">
-					<label for="email">Email Address</label>
-					<input type="email" id="email" name="email" required placeholder="jane@example.com" />
+					<label for="phone">Phone Number</label>
+					<input type="tel" id="phone" name="phone" required placeholder="+977 9800000000" />
 				</div>
 				<div class="form-group">
 					<label for="service">Select Service / Course</label>
@@ -395,13 +395,24 @@
 						<option value="nail-extensions">Nail Extensions</option>
 						<option value="lash-extensions">Lash Extensions</option>
 						<option value="removal">Removal Services</option>
-						<option value="nail-art">Nail Art</option>
 						<option value="courses">Professional Courses</option>
+					</select>
+				</div>
+				<div class="form-group" id="sub-service-group" style="display: none;">
+					<label for="sub-service" id="sub-service-label">Specific Treatment</label>
+					<select id="sub-service" name="sub-service">
+						<!-- Options injected by script.js -->
 					</select>
 				</div>
 				<div class="form-group">
 					<label for="date">Preferred Date</label>
 					<input type="date" id="date" name="date" required />
+				</div>
+				<div class="form-group" id="time-slot-group" style="display: none;">
+					<label for="time">Preferred Time</label>
+					<select id="time" name="time" required>
+						<option value="" disabled selected>Select a time...</option>
+					</select>
 				</div>
 				<button type="submit" class="btn btn-primary btn-block">
 					Confirm Booking

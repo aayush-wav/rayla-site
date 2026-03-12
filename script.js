@@ -84,9 +84,11 @@ document.addEventListener("DOMContentLoaded", () => {
 			const formData = new FormData(bookingForm);
 			const data = {
 				name: formData.get("name"),
-				email: formData.get("email"),
+				phone: formData.get("phone"),
 				service: formData.get("service"),
+				sub_service: formData.get("sub-service") || "N/A",
 				date: formData.get("date"),
+				time: formData.get("time"),
 			};
 
 			try {
@@ -153,6 +155,129 @@ document.addEventListener("DOMContentLoaded", () => {
 	const startCursor = () => {
 		cursorStarted = true;
 	};
+
+	// --- Dynamic Booking Form Logic ---
+	const serviceSelect = document.getElementById("service");
+	const subServiceGroup = document.getElementById("sub-service-group");
+	const subServiceSelect = document.getElementById("sub-service");
+	const subServiceLabel = document.getElementById("sub-service-label");
+
+	const subOptions = {
+		"nail-extensions": [
+			{ value: "gel", text: "Gel (NPR 1500)" },
+			{ value: "gelx", text: "GelX (NPR 1400)" },
+			{ value: "acrylic", text: "Acrylic (NPR 1800)" },
+			{ value: "polygel", text: "Polygel (NPR 1500)" },
+			{ value: "overlay", text: "Overlay (NPR 1000)" },
+			{ value: "choose-on-visit", text: "Choose on Visit" }
+		],
+		"lash-extensions": [
+			{ value: "classic", text: "Classic Lashes (NPR 1500)" },
+			{ value: "cateye", text: "Cateye Lashes (NPR 1800)" },
+			{ value: "wispy", text: "Wispy Lashes (NPR 2000)" },
+			{ value: "lift", text: "Lashes Lift (NPR 1500)" },
+			{ value: "choose-on-visit", text: "Choose on Visit" }
+		],
+		"removal": [
+			{ value: "nail-removal", text: "Nail Extension Removal (NPR 500)" },
+			{ value: "lash-removal", text: "Lash Extension Removal (NPR 700)" },
+			{ value: "choose-on-visit", text: "Choose on Visit" }
+		],
+		"courses": [
+			{ value: "nail-basic", text: "Nail Basic (NPR 10,000)" },
+			{ value: "nail-pro", text: "Nail Professional (NPR 33,000)" },
+			{ value: "lash-basic", text: "Lash Basic (NPR 5,000)" },
+			{ value: "lash-pro", text: "Lash Professional (NPR 16,000)" },
+			{ value: "choose-on-visit", text: "Talk to Expert on Visit" }
+		]
+	};
+
+	if (serviceSelect) {
+		serviceSelect.addEventListener("change", () => {
+			const selected = serviceSelect.value;
+			if (subOptions[selected]) {
+				// Clear current options
+				subServiceSelect.innerHTML = "";
+				
+				// Add a placeholder
+				const placeholder = document.createElement("option");
+				placeholder.value = "";
+				placeholder.disabled = true;
+				placeholder.selected = true;
+				placeholder.textContent = "Select specific type...";
+				subServiceSelect.appendChild(placeholder);
+
+				// Add new options
+				subOptions[selected].forEach(opt => {
+					const o = document.createElement("option");
+					o.value = opt.value;
+					o.textContent = opt.text;
+					subServiceSelect.appendChild(o);
+				});
+
+				subServiceGroup.style.display = "block";
+				subServiceSelect.required = true;
+			} else {
+				subServiceGroup.style.display = "none";
+				subServiceSelect.required = false;
+			}
+		});
+	}
+
+	// --- Dynamic Time Slot Logic ---
+	const dateInput = document.getElementById("date");
+	const timeSlotGroup = document.getElementById("time-slot-group");
+	const timeSelect = document.getElementById("time");
+
+	if (dateInput) {
+		dateInput.addEventListener("change", async () => {
+			const selectedDate = dateInput.value;
+			if (!selectedDate) return;
+
+			timeSelect.innerHTML = '<option value="" disabled selected>Loading slots...</option>';
+			timeSlotGroup.style.display = "block";
+			timeSelect.required = true;
+
+			try {
+				const res = await fetch(`http://localhost:5000/api/availability?date=${selectedDate}`);
+				const data = await res.json();
+
+				timeSelect.innerHTML = "";
+
+				if (data.blocked) {
+					const opt = document.createElement("option");
+					opt.value = "";
+					opt.disabled = true;
+					opt.selected = true;
+					opt.textContent = "❌ This day is fully booked";
+					timeSelect.appendChild(opt);
+				} else if (data.available_slots.length === 0) {
+					const opt = document.createElement("option");
+					opt.value = "";
+					opt.disabled = true;
+					opt.selected = true;
+					opt.textContent = "❌ No slots available for this day";
+					timeSelect.appendChild(opt);
+				} else {
+					const placeholder = document.createElement("option");
+					placeholder.value = "";
+					placeholder.disabled = true;
+					placeholder.selected = true;
+					placeholder.textContent = "Select a time...";
+					timeSelect.appendChild(placeholder);
+
+					data.available_slots.forEach((slot) => {
+						const opt = document.createElement("option");
+						opt.value = slot;
+						opt.textContent = slot;
+						timeSelect.appendChild(opt);
+					});
+				}
+			} catch (err) {
+				timeSelect.innerHTML = '<option value="" disabled selected>Could not load slots</option>';
+			}
+		});
+	}
 
 	const initInstagram = async () => {
 		const grid = document.getElementById("instagram-api-grid");
