@@ -37,26 +37,12 @@ html {
 body {
 	font-family: var(--font-body);
 	color: var(--color-text);
-	background: linear-gradient(-45deg, #dbddd8, #f8e1e1, #dbddd8, #e8caca);
-	background-size: 400% 400%;
+	background-color: var(--color-bg-light);
 	line-height: 1.6;
 	overflow-x: hidden;
 	width: 100%;
 	margin: 0;
 	padding: 0;
-	animation: gradient-shift 15s ease infinite;
-}
-
-@keyframes gradient-shift {
-	0% {
-		background-position: 0% 50%;
-	}
-	50% {
-		background-position: 100% 50%;
-	}
-	100% {
-		background-position: 0% 50%;
-	}
 }
 
 #cursor-canvas {
@@ -341,12 +327,31 @@ img {
 
 @keyframes hero-gradient-pulse {
 	0% {
-		opacity: 0.6;
+		opacity: 0.4;
 		transform: scale(1);
 	}
 	100% {
-		opacity: 0.9;
+		opacity: 0.7;
 		transform: scale(1.1);
+	}
+}
+
+@keyframes light-leak {
+	0% {
+		transform: translate(0, 0) scale(1) rotate(0deg);
+		opacity: 0.2;
+	}
+	33% {
+		transform: translate(100px, -50px) scale(1.2) rotate(10deg);
+		opacity: 0.4;
+	}
+	66% {
+		transform: translate(-50px, 100px) scale(0.9) rotate(-10deg);
+		opacity: 0.3;
+	}
+	100% {
+		transform: translate(0, 0) scale(1) rotate(0deg);
+		opacity: 0.2;
 	}
 }
 
@@ -468,7 +473,53 @@ img {
 }
 
 .bg-blob {
-	display: none;
+	position: fixed;
+	border-radius: 50%;
+	filter: blur(120px);
+	z-index: -1;
+	pointer-events: none;
+	opacity: 0.6;
+}
+
+.blob-1 {
+	width: 900px;
+	height: 900px;
+	background: radial-gradient(
+		circle,
+		rgba(66, 133, 244, 0.8) 0%,
+		transparent 70%
+	);
+	top: -10%;
+	right: -20%;
+	animation: light-leak 20s infinite alternate ease-in-out;
+}
+
+.blob-2 {
+	width: 700px;
+	height: 700px;
+	background: radial-gradient(
+		circle,
+		rgba(161, 66, 244, 0.7) 0%,
+		transparent 70%
+	);
+	bottom: -5%;
+	left: -5%;
+	animation: light-leak 25s infinite alternate-reverse ease-in-out;
+	animation-delay: -5s;
+}
+
+.blob-3 {
+	width: 800px;
+	height: 800px;
+	background: radial-gradient(
+		circle,
+		rgba(0, 212, 255, 0.6) 0%,
+		transparent 70%
+	);
+	top: 30%;
+	left: -10%;
+	animation: light-leak 30s infinite alternate ease-in-out;
+	animation-delay: -10s;
 }
 
 .menu-section {
@@ -573,7 +624,7 @@ img {
 
 .gallery {
 	padding: 8rem 0;
-	background-color: var(--color-bg-light);
+	background-color: transparent;
 }
 
 .gallery-grid {
@@ -632,7 +683,7 @@ img {
 
 .about {
 	padding: 8rem 0;
-	background-color: var(--color-bg-light);
+	background-color: transparent;
 }
 
 .about-grid {
@@ -670,7 +721,7 @@ img {
 
 .reviews {
 	padding: 8rem 0;
-	background-color: var(--color-bg-light);
+	background-color: transparent;
 }
 
 .reviews-grid {
@@ -716,7 +767,7 @@ img {
 
 .booking {
 	padding: 8rem 0;
-	background-color: var(--color-primary);
+	background-color: transparent;
 	color: var(--color-secondary);
 }
 
@@ -724,10 +775,13 @@ img {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
 	gap: 4rem;
-	background-color: var(--color-white);
+	background: rgba(255, 255, 255, 0.1);
+	backdrop-filter: blur(30px) saturate(150%);
+	-webkit-backdrop-filter: blur(30px) saturate(150%);
+	border: 1px solid rgba(255, 255, 255, 0.3);
 	padding: 4rem;
-	border-radius: 8px;
-	box-shadow: var(--shadow-soft);
+	border-radius: 24px;
+	box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
 }
 
 .contact-item {
