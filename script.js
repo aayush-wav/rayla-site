@@ -103,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
 				const result = await response.json();
 
 				if (response.ok) {
-					window.location.href = "/confirmation";
+					window.location.href = "/confirmation.html";
 				} else {
 					throw new Error(result.error || "Something went wrong");
 				}
