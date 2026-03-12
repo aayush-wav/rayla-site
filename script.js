@@ -132,12 +132,28 @@ document.addEventListener("DOMContentLoaded", () => {
 		});
 
 		const interactables = "a, button, .instagram-item, .gallery-item";
+		let isHero = true;
+
 		document.addEventListener("mouseover", (e) => {
 			if (e.target.closest(interactables)) isHovering = true;
+			if (e.target.closest(".hero")) isHero = true;
+			else isHero = false;
 		});
 		document.addEventListener("mouseout", (e) => {
 			if (e.target.closest(interactables)) isHovering = false;
 		});
+
+		// Particle system for Hero section
+		let particles = [];
+		for (let i = 0; i < 20; i++) {
+			particles.push({
+				x: Math.random() * width,
+				y: Math.random() * height,
+				vx: (Math.random() - 0.5) * 2,
+				vy: (Math.random() - 0.5) * 2,
+				size: Math.random() * 3 + 1,
+			});
+		}
 
 		const animateCursor = () => {
 			ctx.clearRect(0, 0, width, height);
@@ -145,34 +161,76 @@ document.addEventListener("DOMContentLoaded", () => {
 			dot.x += (mouse.x - dot.x) * 0.1;
 			dot.y += (mouse.y - dot.y) * 0.1;
 
-			const targetSize = isHovering ? 180 : 100;
-			const currentSize = circle.size || 100;
-			circle.size = currentSize + (targetSize - currentSize) * 0.04;
+			if (isHero && !isHovering) {
+				// Hero Section: Particle "Swarm" effect
+				particles.forEach((p) => {
+					const dx = mouse.x - p.x;
+					const dy = mouse.y - p.y;
+					const dist = Math.sqrt(dx * dx + dy * dy);
 
-			const targetOpacity = isHovering ? 0.45 : 0.25;
-			const currentOpacity = circle.opacity || 0.25;
-			circle.opacity = currentOpacity + (targetOpacity - currentOpacity) * 0.03;
+					// Gravity towards mouse
+					p.vx += dx / 1500;
+					p.vy += dy / 1500;
 
-			const gradient = ctx.createRadialGradient(
-				dot.x,
-				dot.y,
-				0,
-				dot.x,
-				dot.y,
-				circle.size,
-			);
+					// Friction
+					p.vx *= 0.96;
+					p.vy *= 0.96;
 
-			const glowColor = isHovering
-				? "rgba(0, 212, 255, "
-				: "rgba(161, 66, 244, ";
+					p.x += p.vx;
+					p.y += p.vy;
 
-			gradient.addColorStop(0, glowColor + circle.opacity + ")");
-			gradient.addColorStop(1, glowColor + "0)");
+					ctx.fillStyle = `rgba(0, 212, 255, ${Math.max(0, 1 - dist / 300)})`;
+					ctx.beginPath();
+					ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+					ctx.fill();
 
-			ctx.fillStyle = gradient;
-			ctx.beginPath();
-			ctx.arc(dot.x, dot.y, circle.size, 0, Math.PI * 2);
-			ctx.fill();
+					// Connect particles with faint lines
+					particles.forEach((p2) => {
+						const dist2 = Math.sqrt(
+							Math.pow(p.x - p2.x, 2) + Math.pow(p.y - p2.y, 2),
+						);
+						if (dist2 < 100) {
+							ctx.strokeStyle = `rgba(161, 66, 244, ${0.1 * (1 - dist2 / 100)})`;
+							ctx.lineWidth = 0.5;
+							ctx.beginPath();
+							ctx.moveTo(p.x, p.y);
+							ctx.lineTo(p2.x, p2.y);
+							ctx.stroke();
+						}
+					});
+				});
+			} else {
+				// Standard Section or Hover: Soft Orb effect
+				const targetSize = isHovering ? 180 : 100;
+				const currentSize = circle.size || 100;
+				circle.size = currentSize + (targetSize - currentSize) * 0.04;
+
+				const targetOpacity = isHovering ? 0.45 : 0.25;
+				const currentOpacity = circle.opacity || 0.25;
+				circle.opacity =
+					currentOpacity + (targetOpacity - currentOpacity) * 0.03;
+
+				const gradient = ctx.createRadialGradient(
+					dot.x,
+					dot.y,
+					0,
+					dot.x,
+					dot.y,
+					circle.size,
+				);
+
+				const glowColor = isHovering
+					? "rgba(0, 212, 255, "
+					: "rgba(161, 66, 244, ";
+
+				gradient.addColorStop(0, glowColor + circle.opacity + ")");
+				gradient.addColorStop(1, glowColor + "0)");
+
+				ctx.fillStyle = gradient;
+				ctx.beginPath();
+				ctx.arc(dot.x, dot.y, circle.size, 0, Math.PI * 2);
+				ctx.fill();
+			}
 
 			requestAnimationFrame(animateCursor);
 		};
