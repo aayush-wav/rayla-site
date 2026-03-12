@@ -142,27 +142,36 @@ document.addEventListener("DOMContentLoaded", () => {
 		const animateCursor = () => {
 			ctx.clearRect(0, 0, width, height);
 
-			dot.x += (mouse.x - dot.x) * 0.2;
-			dot.y += (mouse.y - dot.y) * 0.2;
+			dot.x += (mouse.x - dot.x) * 0.15;
+			dot.y += (mouse.y - dot.y) * 0.15;
 
-			circle.x += (mouse.x - circle.x) * 0.1;
-			circle.y += (mouse.y - circle.y) * 0.1;
+			const targetSize = isHovering ? 120 : 60;
+			const currentSize = circle.size || 60;
+			circle.size = currentSize + (targetSize - currentSize) * 0.1;
 
-			const color = "#36454F";
-			const targetCircleSize = isHovering ? 30 : 20;
-			const currentCircleSize = circle.size || 20;
-			circle.size =
-				currentCircleSize + (targetCircleSize - currentCircleSize) * 0.1;
+			const targetOpacity = isHovering ? 0.35 : 0.15;
+			const currentOpacity = circle.opacity || 0.15;
+			circle.opacity = currentOpacity + (targetOpacity - currentOpacity) * 0.1;
 
-			ctx.strokeStyle = color;
-			ctx.lineWidth = 1;
+			const gradient = ctx.createRadialGradient(
+				dot.x,
+				dot.y,
+				0,
+				dot.x,
+				dot.y,
+				circle.size,
+			);
+
+			const glowColor = isHovering
+				? "rgba(66, 133, 244, "
+				: "rgba(161, 66, 244, ";
+
+			gradient.addColorStop(0, glowColor + circle.opacity + ")");
+			gradient.addColorStop(1, glowColor + "0)");
+
+			ctx.fillStyle = gradient;
 			ctx.beginPath();
-			ctx.arc(circle.x, circle.y, circle.size, 0, Math.PI * 2);
-			ctx.stroke();
-
-			ctx.fillStyle = color;
-			ctx.beginPath();
-			ctx.arc(dot.x, dot.y, isHovering ? 4 : 2, 0, Math.PI * 2);
+			ctx.arc(dot.x, dot.y, circle.size, 0, Math.PI * 2);
 			ctx.fill();
 
 			requestAnimationFrame(animateCursor);
