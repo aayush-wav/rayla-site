@@ -113,6 +113,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
 
 	let cursorStarted = false;
+	let existenceFactor = 0;
 	const startCursor = () => {
 		cursorStarted = true;
 	};
@@ -124,10 +125,8 @@ document.addEventListener("DOMContentLoaded", () => {
 		let height = (canvas.height = window.innerHeight);
 
 		let mouse = { x: width / 2, y: height / 2 };
-		let dot = { x: width / 2, y: height / 2 };
-		let circle = { x: width / 2, y: height / 2 };
-
-		let isHovering = false;
+		let dot = { x: mouse.x, y: mouse.y };
+		let circle = { x: mouse.x, y: mouse.y, size: 0, opacity: 0 };
 
 		window.addEventListener("resize", () => {
 			width = canvas.width = window.innerWidth;
@@ -157,15 +156,21 @@ document.addEventListener("DOMContentLoaded", () => {
 		let trail = [];
 		const trailLength = 10;
 		for (let i = 0; i < trailLength; i++) {
-			trail.push({ x: width / 2, y: height / 2 });
+			trail.push({ x: mouse.x, y: mouse.y });
 		}
 
 		const animateCursor = () => {
-			if (!cursorStarted) {
+			ctx.clearRect(0, 0, width, height);
+
+			// Smoothly animate the cursor into existence once triggered
+			if (cursorStarted) {
+				existenceFactor += (1 - existenceFactor) * 0.05;
+			}
+
+			if (existenceFactor < 0.01) {
 				requestAnimationFrame(animateCursor);
 				return;
 			}
-			ctx.clearRect(0, 0, width, height);
 
 			// Smoothly transition between modes
 			transitionFactor += (targetTransitionFactor - transitionFactor) * 0.05;
@@ -182,8 +187,8 @@ document.addEventListener("DOMContentLoaded", () => {
 				trail[i].y += (trail[i - 1].y - trail[i].y) * 0.3;
 			}
 
-			// Calculate dynamic properties based on section transition
-			const baseSize = 80 + 120 * transitionFactor;
+			// Calculate dynamic properties based on section transition and entrance bloom
+			const baseSize = (80 + 120 * transitionFactor) * existenceFactor;
 			const hoverScale = isHovering ? 1.6 : 1;
 			const currentSize = baseSize * hoverScale;
 
@@ -192,7 +197,8 @@ document.addEventListener("DOMContentLoaded", () => {
 			for (let i = 0; i < layers; i++) {
 				const layerFactor = 1 - i / layers;
 				const layerSize = currentSize * layerFactor;
-				const layerAlpha = (0.15 + 0.2 * transitionFactor) * layerFactor;
+				const layerAlpha =
+					(0.15 + 0.2 * transitionFactor) * layerFactor * existenceFactor;
 
 				// Hero uses more cyan, other sections more purple
 				const r = Math.round(161 - (161 - 0) * transitionFactor);
