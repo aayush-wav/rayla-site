@@ -146,6 +146,8 @@ ADMIN_HTML = """
         .btn:hover { opacity: 0.85; }
         .btn-primary { background: var(--primary); color: white; }
         .btn-danger { background: var(--danger); color: white; font-size: 0.8rem; padding: 6px 12px; }
+        .btn-success { background: var(--success); color: white; font-size: 0.8rem; padding: 6px 14px; border-radius: 8px; border: none; cursor: pointer; font-family: 'Inter', sans-serif; font-weight: 500; }
+        .btn-success:hover { opacity: 0.85; }
         .blocked-list { display: flex; flex-wrap: wrap; gap: 10px; padding: 20px 24px; }
         .blocked-tag { background: #fde8e8; color: var(--danger); padding: 8px 14px; border-radius: 8px; display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
         .blocked-tag form { display: inline; }
@@ -185,13 +187,14 @@ ADMIN_HTML = """
             <table>
                 <thead>
                     <tr>
-                        <th>Submitted</th>
+                        <th>Date Submitted</th>
                         <th>Client</th>
                         <th>Phone</th>
                         <th>Category</th>
                         <th>Treatment</th>
                         <th>Date</th>
                         <th>Time</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -204,9 +207,15 @@ ADMIN_HTML = """
                         <td style="color:#555; font-style:italic;">{{ b.sub_service if b.sub_service else '—' }}</td>
                         <td>{{ b.date }}</td>
                         <td><span class="time-badge">{{ b.time if b.time else '—' }}</span></td>
+                        <td>
+                            <form action="/admin/complete" method="POST" onsubmit="return confirm('Mark this appointment as complete and remove it?')">
+                                <input type="hidden" name="timestamp" value="{{ b.timestamp }}">
+                                <button type="submit" class="btn-success">✓ Done</button>
+                            </form>
+                        </td>
                     </tr>
                     {% else %}
-                    <tr><td colspan="7" class="empty">No bookings yet.</td></tr>
+                    <tr><td colspan="8" class="empty">No bookings yet.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -300,6 +309,16 @@ def admin_dashboard():
     latest = bookings_display[0]['timestamp'] if total > 0 else "No bookings yet"
     return render_template_string(ADMIN_HTML, bookings=bookings_display, total=total,
                                   blocked_count=len(blockings), latest=latest)
+
+@app.route('/admin/complete', methods=['POST'])
+@requires_auth
+def complete_booking():
+    timestamp = request.form.get('timestamp')
+    if timestamp:
+        bookings = load_json(BOOKINGS_FILE)
+        bookings = [b for b in bookings if b.get('timestamp') != timestamp]
+        save_json(BOOKINGS_FILE, bookings)
+    return redirect(url_for('admin_dashboard'))
 
 @app.route('/admin/blocked')
 @requires_auth
