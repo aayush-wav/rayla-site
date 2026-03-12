@@ -92,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			};
 
 			try {
-				const response = await fetch("http://localhost:5000/api/booking", {
+				const response = await fetch("/api/booking", {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
@@ -239,7 +239,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			timeSelect.required = true;
 
 			try {
-				const res = await fetch(`http://localhost:5000/api/availability?date=${selectedDate}`);
+				const res = await fetch(`/api/availability?date=${selectedDate}`);
 				const data = await res.json();
 
 				timeSelect.innerHTML = "";
