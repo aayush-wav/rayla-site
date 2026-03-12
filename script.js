@@ -73,20 +73,56 @@ document.addEventListener("DOMContentLoaded", () => {
 	const formMessage = document.getElementById("form-message");
 
 	if (bookingForm) {
-		bookingForm.addEventListener("submit", (e) => {
+		bookingForm.addEventListener("submit", async (e) => {
 			e.preventDefault();
 
+			const submitBtn = bookingForm.querySelector('button[type="submit"]');
+			const originalBtnText = submitBtn.textContent;
+			submitBtn.disabled = true;
+			submitBtn.textContent = "Processing...";
+
 			const formData = new FormData(bookingForm);
-			const name = formData.get("name");
+			const data = {
+				name: formData.get("name"),
+				email: formData.get("email"),
+				service: formData.get("service"),
+				date: formData.get("date"),
+			};
 
-			formMessage.textContent = `Thank you, ${name}! Your booking request has been received. We will contact you shortly to confirm.`;
-			formMessage.className = "form-message success";
+			try {
+				const response = await fetch("http://localhost:5000/api/booking", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify(data),
+				});
 
-			bookingForm.reset();
+				const result = await response.json();
 
-			setTimeout(() => {
-				formMessage.style.display = "none";
-			}, 5000);
+				if (response.ok) {
+					formMessage.textContent = result.message;
+					formMessage.className = "form-message success";
+					formMessage.style.display = "block";
+					bookingForm.reset();
+				} else {
+					throw new Error(result.error || "Something went wrong");
+				}
+			} catch (error) {
+				formMessage.textContent = `Error: ${error.message}. Please try again later.`;
+				formMessage.className = "form-message error";
+				formMessage.style.display = "block";
+				formMessage.style.backgroundColor = "#f8d7da";
+				formMessage.style.color = "#721c24";
+				formMessage.style.border = "1px solid #f5c6cb";
+			} finally {
+				submitBtn.disabled = false;
+				submitBtn.textContent = originalBtnText;
+
+				setTimeout(() => {
+					formMessage.style.display = "none";
+				}, 6000);
+			}
 		});
 	}
 
