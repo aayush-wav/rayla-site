@@ -11,7 +11,18 @@ CORS(app)
 # --- Configuration ---
 BOOKINGS_FILE = 'bookings.json'
 BLOCKED_DAYS_FILE = 'blocked_days.json'
+BLOCKED_SLOTS_FILE = 'blocked_slots.json'  # list of "YYYY-MM-DD HH:MM" strings
+SETTINGS_FILE = 'settings.json'
 ADMIN_PASSWORD = 'rayla_admin_2026'
+
+def get_num_technicians():
+    if os.path.exists(SETTINGS_FILE):
+        with open(SETTINGS_FILE, 'r') as f:
+            try:
+                return json.load(f).get('num_technicians', 2)
+            except:
+                pass
+    return 2
 
 # Salon hours — 30-min slots from 10:00 to 19:00
 ALL_SLOTS = [
@@ -66,11 +77,27 @@ def get_availability():
     if date in blocked_days:
         return jsonify({"blocked": True, "available_slots": []})
 
+    num_tech = get_num_technicians()
     bookings = load_json(BOOKINGS_FILE)
-    booked_times = {b['time'] for b in bookings if b.get('date') == date}
-    available = [s for s in ALL_SLOTS if s not in booked_times]
+    blocked_slots = load_json(BLOCKED_SLOTS_FILE)
 
-    return jsonify({"blocked": False, "available_slots": available, "booked_slots": list(booked_times)})
+    # Count bookings per slot for this date
+    slot_counts = {}
+    for b in bookings:
+        if b.get('date') == date:
+            t = b.get('time')
+            slot_counts[t] = slot_counts.get(t, 0) + 1
+
+    # Build manually blocked set for this date ("YYYY-MM-DD HH:MM")
+    manual_blocked = {entry.split(' ')[1] for entry in blocked_slots if entry.startswith(date + ' ')}
+
+    available = []
+    for s in ALL_SLOTS:
+        bookings_for_slot = slot_counts.get(s, 0)
+        if s not in manual_blocked and bookings_for_slot < num_tech:
+            available.append(s)
+
+    return jsonify({"blocked": False, "available_slots": available})
 
 @app.route('/api/booking', methods=['POST'])
 def handle_booking():
@@ -92,11 +119,19 @@ def handle_booking():
     if date in blocked_days:
         return jsonify({"error": "Sorry, this day is fully booked. Please choose another date."}), 409
 
-    # Check if time slot is taken
+    num_tech = get_num_technicians()
     bookings = load_json(BOOKINGS_FILE)
-    for b in bookings:
-        if b.get('date') == date and b.get('time') == time:
-            return jsonify({"error": f"The {time} slot on {date} is already taken. Please choose a different time."}), 409
+    blocked_slots = load_json(BLOCKED_SLOTS_FILE)
+
+    # Check manual slot block
+    slot_key = f"{date} {time}"
+    if slot_key in blocked_slots:
+        return jsonify({"error": f"The {time} slot on {date} is unavailable. Please choose a different time."}), 409
+
+    # Check capacity: count existing bookings for this date+time
+    existing = sum(1 for b in bookings if b.get('date') == date and b.get('time') == time)
+    if existing >= num_tech:
+        return jsonify({"error": f"The {time} slot on {date} is fully booked. Please choose a different time."}), 409
 
     data['timestamp'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     bookings.append(data)
@@ -230,10 +265,10 @@ BLOCKED_HTML = """
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Rayla Admin | Block Days</title>
+    <title>Rayla Admin | Availability</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #36454f; --accent: #f8e1e1; --bg: #f5f7f8; --danger: #e74c3c; }
+        :root { --primary: #36454f; --accent: #f8e1e1; --bg: #f5f7f8; --danger: #e74c3c; --success: #27ae60; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--primary); }
         .sidebar { position: fixed; top: 0; left: 0; width: 220px; height: 100vh; background: var(--primary); color: white; padding: 30px 20px; }
@@ -243,45 +278,79 @@ BLOCKED_HTML = """
         .main { margin-left: 220px; padding: 40px; }
         h1 { font-family: 'Playfair Display', serif; font-size: 2rem; margin-bottom: 30px; }
         .section { background: white; border-radius: 14px; box-shadow: 0 2px 15px rgba(0,0,0,0.06); overflow: hidden; margin-bottom: 30px; }
-        .section-header { padding: 20px 24px; border-bottom: 1px solid #f0f0f0; font-weight: 600; }
-        .block-form { padding: 24px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-        .block-form label { font-size: 0.9rem; color: #666; margin-right: 8px; }
-        .block-form input[type=date] { padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.95rem; }
+        .section-header { padding: 20px 24px; border-bottom: 1px solid #f0f0f0; font-weight: 600; font-size: 1rem; }
+        .form-row { padding: 24px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .form-row label { font-size: 0.9rem; color: #666; }
+        .form-row input[type=date], .form-row select, .form-row input[type=number] { padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.95rem; }
         .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-family: 'Inter', sans-serif; font-weight: 500; transition: opacity 0.2s; }
         .btn:hover { opacity: 0.85; }
         .btn-primary { background: var(--primary); color: white; }
         .btn-danger { background: var(--danger); color: white; font-size: 0.8rem; padding: 6px 12px; border-radius: 6px; }
-        .blocked-list { display: flex; flex-wrap: wrap; gap: 10px; padding: 24px; }
-        .blocked-tag { background: #fde8e8; color: var(--danger); padding: 10px 16px; border-radius: 10px; display: flex; align-items: center; gap: 12px; font-size: 0.95rem; font-weight: 500; }
+        .tag-list { display: flex; flex-wrap: wrap; gap: 10px; padding: 24px; }
+        .tag { padding: 10px 16px; border-radius: 10px; display: flex; align-items: center; gap: 12px; font-size: 0.9rem; font-weight: 500; }
+        .tag-day { background: #fde8e8; color: var(--danger); }
+        .tag-slot { background: #fff3cd; color: #856404; }
         .empty { padding: 30px 24px; color: #aaa; font-style: italic; }
-        .note { padding: 16px 24px; background: #fffbeb; border-left: 4px solid #f59e0b; color: #92400e; font-size: 0.9rem; }
+        .note { padding: 14px 24px; background: #fffbeb; border-left: 4px solid #f59e0b; color: #92400e; font-size: 0.88rem; }
+        .settings-row { padding: 24px; display: flex; gap: 16px; align-items: center; }
+        .technician-count { font-size: 2rem; font-weight: 700; color: var(--primary); padding: 0 10px; }
     </style>
 </head>
 <body>
     <div class="sidebar">
         <h2>Rayla Admin</h2>
         <a href="/admin">📋 Bookings</a>
-        <a href="/admin/blocked" class="active">🚫 Block Days</a>
+        <a href="/admin/blocked" class="active">🚫 Availability</a>
     </div>
     <div class="main">
-        <h1>Manage Blocked Days</h1>
+        <h1>Manage Availability</h1>
 
+        <!-- Technician Count -->
         <div class="section">
-            <div class="section-header">Block a Full Day</div>
-            <div class="note">When a day is blocked, no new client bookings can be made for that date.</div>
-            <form class="block-form" action="/admin/block" method="POST">
-                <label for="block-date">Select Date:</label>
-                <input type="date" id="block-date" name="date" required>
-                <button type="submit" class="btn btn-primary">Mark as Packed</button>
+            <div class="section-header">👥 Number of Technicians on Duty</div>
+            <div class="note">Each time slot can hold this many simultaneous bookings. Adjust when staff is reduced.</div>
+            <form class="settings-row" action="/admin/settings" method="POST">
+                <label>Active Technicians:</label>
+                <input type="number" name="num_technicians" value="{{ num_tech }}" min="1" max="10" style="width:80px;">
+                <button type="submit" class="btn btn-primary">Save</button>
             </form>
         </div>
 
+        <!-- Block Full Day -->
         <div class="section">
-            <div class="section-header">Currently Blocked Days ({{ blocked_days|length }})</div>
+            <div class="section-header">📅 Block a Full Day</div>
+            <div class="note">Clients won't be able to book any slot on this day.</div>
+            <form class="form-row" action="/admin/block" method="POST">
+                <label>Date:</label>
+                <input type="date" name="date" required>
+                <button type="submit" class="btn btn-primary">Mark Day as Packed</button>
+            </form>
+        </div>
+
+        <!-- Block a Specific Slot -->
+        <div class="section">
+            <div class="section-header">🕐 Block a Specific Time Slot</div>
+            <div class="note">Use this when all technicians are busy for just one particular slot on a day.</div>
+            <form class="form-row" action="/admin/block-slot" method="POST">
+                <label>Date:</label>
+                <input type="date" name="date" required>
+                <label>Time:</label>
+                <select name="time" required>
+                    {% for slot in all_slots %}
+                    <option value="{{ slot }}">{{ slot }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-primary">Block Slot</button>
+            </form>
+        </div>
+
+        <!-- Blocked Days List -->
+        <div class="section">
+            <div class="section-header">Blocked Full Days ({{ blocked_days|length }})</div>
             {% if blocked_days %}
-            <div class="blocked-list">
+            <div class="tag-list">
                 {% for d in blocked_days %}
-                <div class="blocked-tag">
+                <div class="tag tag-day">
                     📅 {{ d }}
                     <form action="/admin/unblock" method="POST" style="display:inline;">
                         <input type="hidden" name="date" value="{{ d }}">
@@ -291,7 +360,27 @@ BLOCKED_HTML = """
                 {% endfor %}
             </div>
             {% else %}
-            <div class="empty">No days currently blocked.</div>
+            <div class="empty">No full days blocked.</div>
+            {% endif %}
+        </div>
+
+        <!-- Blocked Slots List -->
+        <div class="section">
+            <div class="section-header">Blocked Time Slots ({{ blocked_slots|length }})</div>
+            {% if blocked_slots %}
+            <div class="tag-list">
+                {% for s in blocked_slots %}
+                <div class="tag tag-slot">
+                    🕐 {{ s }}
+                    <form action="/admin/unblock-slot" method="POST" style="display:inline;">
+                        <input type="hidden" name="slot" value="{{ s }}">
+                        <button type="submit" class="btn btn-danger">Unblock</button>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty">No individual slots blocked.</div>
             {% endif %}
         </div>
     </div>
@@ -324,7 +413,13 @@ def complete_booking():
 @requires_auth
 def admin_blocked():
     blocked_days = load_json(BLOCKED_DAYS_FILE)
-    return render_template_string(BLOCKED_HTML, blocked_days=sorted(blocked_days))
+    blocked_slots = load_json(BLOCKED_SLOTS_FILE)
+    num_tech = get_num_technicians()
+    return render_template_string(BLOCKED_HTML,
+        blocked_days=sorted(blocked_days),
+        blocked_slots=sorted(blocked_slots),
+        num_tech=num_tech,
+        all_slots=ALL_SLOTS)
 
 @app.route('/admin/block', methods=['POST'])
 @requires_auth
@@ -345,6 +440,37 @@ def unblock_day():
         blocked = load_json(BLOCKED_DAYS_FILE)
         blocked = [d for d in blocked if d != date]
         save_json(BLOCKED_DAYS_FILE, blocked)
+    return redirect(url_for('admin_blocked'))
+
+@app.route('/admin/block-slot', methods=['POST'])
+@requires_auth
+def block_slot():
+    date = request.form.get('date')
+    time = request.form.get('time')
+    if date and time:
+        slot_key = f"{date} {time}"
+        blocked = load_json(BLOCKED_SLOTS_FILE)
+        if slot_key not in blocked:
+            blocked.append(slot_key)
+            save_json(BLOCKED_SLOTS_FILE, blocked)
+    return redirect(url_for('admin_blocked'))
+
+@app.route('/admin/unblock-slot', methods=['POST'])
+@requires_auth
+def unblock_slot():
+    slot = request.form.get('slot')
+    if slot:
+        blocked = load_json(BLOCKED_SLOTS_FILE)
+        blocked = [s for s in blocked if s != slot]
+        save_json(BLOCKED_SLOTS_FILE, blocked)
+    return redirect(url_for('admin_blocked'))
+
+@app.route('/admin/settings', methods=['POST'])
+@requires_auth
+def save_settings():
+    num_tech = request.form.get('num_technicians')
+    if num_tech and num_tech.isdigit():
+        save_json(SETTINGS_FILE, {'num_technicians': int(num_tech)})
     return redirect(url_for('admin_blocked'))
 
 
