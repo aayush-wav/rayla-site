@@ -103,10 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
 				const result = await response.json();
 
 				if (response.ok) {
-					formMessage.textContent = result.message;
-					formMessage.className = "form-message success";
-					formMessage.style.display = "block";
-					bookingForm.reset();
+					window.location.href = "/confirmation";
 				} else {
 					throw new Error(result.error || "Something went wrong");
 				}

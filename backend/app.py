@@ -38,6 +38,8 @@ def index():
 
 @app.route('/<path:filename>')
 def serve_static(filename):
+    if filename == 'confirmation':
+        return send_from_directory(FRONT_DIR, 'confirmation.html')
     if filename in ['style.css', 'script.js', 'favicon.ico']:
         return send_from_directory(FRONT_DIR, filename)
     if filename.startswith('images/'):
