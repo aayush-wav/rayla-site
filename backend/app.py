@@ -148,18 +148,19 @@ SHARED_STYLES = """
     .sidebar h2{font-family:'Playfair Display',serif;font-size:1.4rem;margin-bottom:30px}
     .sidebar a{display:block;color:rgba(255,255,255,.7);text-decoration:none;padding:10px 12px;border-radius:8px;margin-bottom:5px;font-size:.9rem;transition:all .2s}
     .sidebar a:hover,.sidebar a.active{background:rgba(255,255,255,.15);color:#fff}
-    .main{margin-left:220px;padding:40px}
+    .main{margin-left:220px;padding:40px;transition:margin-left .3s ease}
     h1{font-family:'Playfair Display',serif;font-size:2rem;margin-bottom:30px}
     .section{background:#fff;border-radius:14px;box-shadow:0 2px 15px rgba(0,0,0,.06);overflow:hidden;margin-bottom:30px}
+    .section-content{overflow-x:auto}
     .section-header{padding:20px 24px;border-bottom:1px solid #f0f0f0;font-weight:600;font-size:1rem}
     .form-row{padding:24px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
     .form-row label{font-size:.9rem;color:#666}
     .form-row input[type=date],.form-row select,.form-row input[type=number]{padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-family:'Inter',sans-serif;font-size:.95rem}
-    .btn{padding:10px 20px;border:none;border-radius:8px;cursor:pointer;font-family:'Inter',sans-serif;font-weight:500;transition:opacity .2s}
+    .btn{padding:10px 20px;border:none;border-radius:8px;cursor:pointer;font-family:'Inter',sans-serif;font-weight:500;transition:opacity .2s;white-space:nowrap}
     .btn:hover{opacity:.85}
     .btn-primary{background:var(--primary);color:#fff}
     .btn-danger{background:var(--danger);color:#fff;font-size:.8rem;padding:6px 12px;border-radius:6px}
-    .btn-success{background:var(--success);color:#fff;font-size:.8rem;padding:6px 14px;border-radius:8px;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-weight:500}
+    .btn-success{background:var(--success);color:#fff;font-size:.8rem;padding:6px 14px;border-radius:8px;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-weight:500;white-space:nowrap}
     .btn-success:hover{opacity:.85}
     .tag-list{display:flex;flex-wrap:wrap;gap:10px;padding:24px}
     .tag{padding:10px 16px;border-radius:10px;display:flex;align-items:center;gap:12px;font-size:.9rem;font-weight:500}
@@ -169,7 +170,7 @@ SHARED_STYLES = """
     .card{background:#fff;padding:24px;border-radius:14px;box-shadow:0 2px 15px rgba(0,0,0,.06)}
     .card h3{font-size:.8rem;text-transform:uppercase;color:#999;letter-spacing:1px;margin-bottom:10px}
     .card .value{font-size:2.2rem;font-weight:600}
-    table{width:100%;border-collapse:collapse}
+    table{width:100%;border-collapse:collapse;min-width:600px}
     th{background:#fafafa;text-align:left;padding:12px 20px;font-size:.8rem;text-transform:uppercase;color:#999;letter-spacing:.5px}
     td{padding:14px 20px;border-bottom:1px solid #f5f5f5;font-size:.95rem}
     tr:last-child td{border-bottom:none}
@@ -178,7 +179,17 @@ SHARED_STYLES = """
     .time-badge{background:#e8f4fd;color:#2980b9;padding:3px 10px;border-radius:6px;font-size:.85rem;font-weight:500}
     .empty{padding:30px 24px;color:#aaa;font-style:italic}
     .note{padding:14px 24px;background:#fffbeb;border-left:4px solid #f59e0b;color:#92400e;font-size:.88rem}
-    .page-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px}
+    .page-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;flex-wrap:wrap;gap:15px}
+    @media (max-width:992px){
+        .sidebar{width:60px;padding:30px 10px}
+        .sidebar h2{display:none}
+        .sidebar a{text-align:center;font-size:1.2rem;padding:15px 0}
+        .main{margin-left:60px;padding:20px}
+    }
+    @media (max-width:768px){
+        .stats{grid-template-columns:1fr}
+        h1{font-size:1.5rem}
+    }
 </style>
 """
 
@@ -202,40 +213,42 @@ ADMIN_HTML = """<!DOCTYPE html>
         <button class="btn btn-primary" onclick="location.reload()">↻ Refresh</button>
     </div>
     <div class="stats">
-        <div class="card"><h3>Total Bookings</h3><div class="value">{{ total }}</div></div>
-        <div class="card"><h3>Blocked Days</h3><div class="value">{{ blocked_count }}</div></div>
-        <div class="card"><h3>Latest Booking</h3><div class="value" style="font-size:1rem;line-height:1.4">{{ latest }}</div></div>
+        <div class="card"><h3>Appointments</h3><div class="value">{{ total }}</div></div>
+        <div class="card"><h3>Technicians</h3><div class="value">{{ num_tech }}</div></div>
+        <div class="card"><h3>Availability</h3><div class="value" style="font-size:1.2rem;line-height:1.4">{{ blocked_days }} Days Blocked<br>{{ blocked_slots }} Slots Blocked</div></div>
     </div>
     <div class="section">
         <div class="section-header">All Appointments</div>
-        <table>
-            <thead><tr>
-                <th>Submitted</th><th>Client</th><th>Phone</th>
-                <th>Category</th><th>Treatment</th><th>Date</th><th>Time</th><th>Action</th>
-            </tr></thead>
-            <tbody>
-            {% for b in bookings %}
-            <tr>
-                <td style="color:#aaa;font-size:.85rem">{{ b.timestamp }}</td>
-                <td><strong>{{ b.name }}</strong></td>
-                <td>{{ b.phone if b.phone else b.email if b.email else '—' }}</td>
-                <td><span class="badge badge-service">{{ b.service }}</span></td>
-                <td style="color:#555;font-style:italic">{{ b.sub_service if b.sub_service else '—' }}</td>
-                <td>{{ b.date }}</td>
-                <td><span class="time-badge">{{ b.time if b.time else '—' }}</span></td>
-                <td>
-                    <form action="/admin/complete" method="POST"
-                          onsubmit="return confirm('Mark appointment as complete and remove it?')">
-                        <input type="hidden" name="timestamp" value="{{ b.timestamp }}">
-                        <button type="submit" class="btn-success">✓ Done</button>
-                    </form>
-                </td>
-            </tr>
-            {% else %}
-            <tr><td colspan="8" class="empty">No bookings yet.</td></tr>
-            {% endfor %}
-            </tbody>
-        </table>
+        <div class="section-content">
+            <table>
+                <thead><tr>
+                    <th>Submitted</th><th>Client</th><th>Phone</th>
+                    <th>Category</th><th>Treatment</th><th>Date</th><th>Time</th><th>Action</th>
+                </tr></thead>
+                <tbody>
+                {% for b in bookings %}
+                <tr>
+                    <td style="color:#aaa;font-size:.85rem">{{ b.timestamp }}</td>
+                    <td><strong>{{ b.name }}</strong></td>
+                    <td>{{ b.phone if b.phone else b.email if b.email else '—' }}</td>
+                    <td><span class="badge badge-service">{{ b.service }}</span></td>
+                    <td style="color:#555;font-style:italic">{{ b.sub_service if b.sub_service else '—' }}</td>
+                    <td>{{ b.date }}</td>
+                    <td><span class="time-badge">{{ b.time if b.time else '—' }}</span></td>
+                    <td>
+                        <form action="/admin/complete" method="POST"
+                              onsubmit="return confirm('Mark appointment as complete and remove it?')">
+                            <input type="hidden" name="timestamp" value="{{ b.timestamp }}">
+                            <button type="submit" class="btn-success">✓ Done</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="8" class="empty">No bookings yet.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div></body></html>
 """
@@ -319,12 +332,18 @@ BLOCKED_HTML = """<!DOCTYPE html>
 @requires_auth
 def admin_dashboard():
     bookings = load_json(BOOKINGS_FILE)
-    blocked  = load_json(BLOCKED_DAYS_FILE)
+    blocked_days = load_json(BLOCKED_DAYS_FILE)
+    blocked_slots = load_json(BLOCKED_SLOTS_FILE)
     display  = list(reversed(bookings))
     total    = len(bookings)
-    latest   = display[0]['timestamp'] if total > 0 else "No bookings yet"
-    return render_template_string(ADMIN_HTML, bookings=display, total=total,
-                                  blocked_count=len(blocked), latest=latest)
+    num_tech = get_num_technicians()
+    
+    return render_template_string(ADMIN_HTML, 
+                                  bookings=display, 
+                                  total=total,
+                                  num_tech=num_tech,
+                                  blocked_days=len(blocked_days),
+                                  blocked_slots=len(blocked_slots))
 
 @app.route('/admin/complete', methods=['POST'])
 @requires_auth

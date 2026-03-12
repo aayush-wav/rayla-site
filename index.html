@@ -14,6 +14,7 @@
 		rel="stylesheet" />
 	<link rel="stylesheet" href="style.css" />
 	<link rel="icon" type="image/png" href="images/logo.png" />
+	<link rel="icon" type="image/png" href="images/favicon_rayla_gold_r.png">
 </head>
 
 <body>
@@ -386,7 +387,15 @@
 				</div>
 				<div class="form-group">
 					<label for="phone">Phone Number</label>
-					<input type="tel" id="phone" name="phone" required placeholder="+977 9800000000" />
+					<input 
+						type="tel" 
+						id="phone" 
+						name="phone" 
+						placeholder="98XXXXXXXX" 
+						required 
+						pattern="[0-9]{7,15}"
+						title="Please enter a valid phone number (7-15 digits)"
+					/>
 				</div>
 				<div class="form-group">
 					<label for="service">Select Service / Course</label>
