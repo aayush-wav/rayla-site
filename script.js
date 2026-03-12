@@ -103,11 +103,19 @@ document.addEventListener("DOMContentLoaded", () => {
 				}
 				i++;
 				setTimeout(typeWriter, 120);
+			} else {
+				// Start cursor after typing is done
+				startCursor();
 			}
 		};
 
 		setTimeout(typeWriter, 800);
 	}
+
+	let cursorStarted = false;
+	const startCursor = () => {
+		cursorStarted = true;
+	};
 
 	const canvas = document.getElementById("cursor-canvas");
 	if (canvas) {
@@ -132,103 +140,86 @@ document.addEventListener("DOMContentLoaded", () => {
 		});
 
 		const interactables = "a, button, .instagram-item, .gallery-item";
-		let isHero = true;
+		let transitionFactor = 1; // 1 for hero, 0 for other sections
+		let targetTransitionFactor = 1;
 
 		document.addEventListener("mouseover", (e) => {
 			if (e.target.closest(interactables)) isHovering = true;
-			if (e.target.closest(".hero")) isHero = true;
-			else isHero = false;
+			if (e.target.closest(".hero")) targetTransitionFactor = 1;
+			else targetTransitionFactor = 0;
 		});
+
 		document.addEventListener("mouseout", (e) => {
 			if (e.target.closest(interactables)) isHovering = false;
 		});
 
-		// Particle system for Hero section
-		let particles = [];
-		for (let i = 0; i < 20; i++) {
-			particles.push({
-				x: Math.random() * width,
-				y: Math.random() * height,
-				vx: (Math.random() - 0.5) * 2,
-				vy: (Math.random() - 0.5) * 2,
-				size: Math.random() * 3 + 1,
-			});
+		// Trail for fluid feel
+		let trail = [];
+		const trailLength = 10;
+		for (let i = 0; i < trailLength; i++) {
+			trail.push({ x: width / 2, y: height / 2 });
 		}
 
 		const animateCursor = () => {
+			if (!cursorStarted) {
+				requestAnimationFrame(animateCursor);
+				return;
+			}
 			ctx.clearRect(0, 0, width, height);
 
-			dot.x += (mouse.x - dot.x) * 0.1;
-			dot.y += (mouse.y - dot.y) * 0.1;
+			// Smoothly transition between modes
+			transitionFactor += (targetTransitionFactor - transitionFactor) * 0.05;
 
-			if (isHero && !isHovering) {
-				// Hero Section: Particle "Swarm" effect
-				particles.forEach((p) => {
-					const dx = mouse.x - p.x;
-					const dy = mouse.y - p.y;
-					const dist = Math.sqrt(dx * dx + dy * dy);
+			// Update main position with high smoothing
+			dot.x += (mouse.x - dot.x) * 0.15;
+			dot.y += (mouse.y - dot.y) * 0.15;
 
-					// Gravity towards mouse
-					p.vx += dx / 1500;
-					p.vy += dy / 1500;
+			// Update trail for liquid effect
+			trail[0].x = dot.x;
+			trail[0].y = dot.y;
+			for (let i = 1; i < trailLength; i++) {
+				trail[i].x += (trail[i - 1].x - trail[i].x) * 0.3;
+				trail[i].y += (trail[i - 1].y - trail[i].y) * 0.3;
+			}
 
-					// Friction
-					p.vx *= 0.96;
-					p.vy *= 0.96;
+			// Calculate dynamic properties based on section transition
+			const baseSize = 80 + 120 * transitionFactor;
+			const hoverScale = isHovering ? 1.6 : 1;
+			const currentSize = baseSize * hoverScale;
 
-					p.x += p.vx;
-					p.y += p.vy;
+			// Draw liquid layers
+			const layers = isHovering ? 3 : 2;
+			for (let i = 0; i < layers; i++) {
+				const layerFactor = 1 - i / layers;
+				const layerSize = currentSize * layerFactor;
+				const layerAlpha = (0.15 + 0.2 * transitionFactor) * layerFactor;
 
-					ctx.fillStyle = `rgba(0, 212, 255, ${Math.max(0, 1 - dist / 300)})`;
-					ctx.beginPath();
-					ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-					ctx.fill();
-
-					// Connect particles with faint lines
-					particles.forEach((p2) => {
-						const dist2 = Math.sqrt(
-							Math.pow(p.x - p2.x, 2) + Math.pow(p.y - p2.y, 2),
-						);
-						if (dist2 < 100) {
-							ctx.strokeStyle = `rgba(161, 66, 244, ${0.1 * (1 - dist2 / 100)})`;
-							ctx.lineWidth = 0.5;
-							ctx.beginPath();
-							ctx.moveTo(p.x, p.y);
-							ctx.lineTo(p2.x, p2.y);
-							ctx.stroke();
-						}
-					});
-				});
-			} else {
-				// Standard Section or Hover: Soft Orb effect
-				const targetSize = isHovering ? 180 : 100;
-				const currentSize = circle.size || 100;
-				circle.size = currentSize + (targetSize - currentSize) * 0.04;
-
-				const targetOpacity = isHovering ? 0.45 : 0.25;
-				const currentOpacity = circle.opacity || 0.25;
-				circle.opacity =
-					currentOpacity + (targetOpacity - currentOpacity) * 0.03;
+				// Hero uses more cyan, other sections more purple
+				const r = Math.round(161 - (161 - 0) * transitionFactor);
+				const g = Math.round(66 + (212 - 66) * transitionFactor);
+				const b = Math.round(244 + (255 - 244) * transitionFactor);
 
 				const gradient = ctx.createRadialGradient(
-					dot.x,
-					dot.y,
+					trail[i * 2]?.x || dot.x,
+					trail[i * 2]?.y || dot.y,
 					0,
-					dot.x,
-					dot.y,
-					circle.size,
+					trail[i * 2]?.x || dot.x,
+					trail[i * 2]?.y || dot.y,
+					layerSize,
 				);
 
-				const glowColor = isHovering
-					? "rgba(0, 212, 255, "
-					: "rgba(161, 66, 244, ";
-
-				gradient.addColorStop(0, glowColor + circle.opacity + ")");
-				gradient.addColorStop(1, glowColor + "0)");
+				gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${layerAlpha})`);
+				gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
 
 				ctx.fillStyle = gradient;
 				ctx.beginPath();
-				ctx.arc(dot.x, dot.y, circle.size, 0, Math.PI * 2);
+				ctx.arc(
+					trail[i * 2]?.x || dot.x,
+					trail[i * 2]?.y || dot.y,
+					layerSize,
+					0,
+					Math.PI * 2,
+				);
 				ctx.fill();
 			}
 
