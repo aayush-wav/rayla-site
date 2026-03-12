@@ -316,6 +316,26 @@ img {
 	}
 }
 
+@keyframes bg-float {
+	0% {
+		transform: translate3d(0, 0, 0) scale(1.1);
+	}
+	100% {
+		transform: translate3d(60px, 50px, 0) scale(1);
+	}
+}
+
+@keyframes hero-gradient-pulse {
+	0% {
+		opacity: 0.6;
+		transform: scale(1);
+	}
+	100% {
+		opacity: 0.9;
+		transform: scale(1.1);
+	}
+}
+
 .hero::before {
 	content: "";
 	position: absolute;
@@ -329,6 +349,7 @@ img {
 		var(--color-bg-light) 85%
 	);
 	z-index: 1;
+	animation: hero-gradient-pulse 10s infinite alternate ease-in-out;
 }
 
 .hero-content {
@@ -439,6 +460,7 @@ img {
 	z-index: 0;
 	opacity: 0.6;
 	pointer-events: none;
+	animation: bg-float 20s infinite alternate ease-in-out;
 }
 
 .blob-1 {
@@ -448,6 +470,7 @@ img {
 	top: 80vh;
 	left: -10%;
 	opacity: 0.4;
+	animation-duration: 25s;
 }
 
 .blob-2 {
@@ -457,6 +480,8 @@ img {
 	top: 120vh;
 	right: -10%;
 	opacity: 0.3;
+	animation-duration: 30s;
+	animation-delay: -5s;
 }
 
 .blob-3 {
@@ -471,6 +496,8 @@ img {
 	opacity: 0.2;
 	border-radius: 50%;
 	pointer-events: none;
+	animation: bg-float 22s infinite alternate ease-in-out;
+	animation-delay: -10s;
 }
 
 .menu-section {
