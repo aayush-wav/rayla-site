@@ -116,7 +116,7 @@ img {
 	cursor: pointer;
 	transition: var(--transition-smooth);
 	text-align: center;
-	border-radius: 8px; /* Subtle elegant rounding */
+	border-radius: 8px;
 }
 
 .btn-primary {
@@ -786,7 +786,7 @@ img {
 }
 
 .booking-form .btn {
-	border-radius: 0; /* Keep the confirm booking button square */
+	border-radius: 0;
 }
 
 .contact-item {

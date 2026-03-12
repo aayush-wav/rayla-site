@@ -142,7 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
 				i++;
 				setTimeout(typeWriter, 120);
 			} else {
-				// Start cursor after typing is done
+				
 				startCursor();
 			}
 		};
@@ -156,7 +156,6 @@ document.addEventListener("DOMContentLoaded", () => {
 		cursorStarted = true;
 	};
 
-	// --- Dynamic Booking Form Logic ---
 	const serviceSelect = document.getElementById("service");
 	const subServiceGroup = document.getElementById("sub-service-group");
 	const subServiceSelect = document.getElementById("sub-service");
@@ -196,10 +195,9 @@ document.addEventListener("DOMContentLoaded", () => {
 		serviceSelect.addEventListener("change", () => {
 			const selected = serviceSelect.value;
 			if (subOptions[selected]) {
-				// Clear current options
-				subServiceSelect.innerHTML = "";
 				
-				// Add a placeholder
+				subServiceSelect.innerHTML = "";
+
 				const placeholder = document.createElement("option");
 				placeholder.value = "";
 				placeholder.disabled = true;
@@ -207,7 +205,6 @@ document.addEventListener("DOMContentLoaded", () => {
 				placeholder.textContent = "Select specific type...";
 				subServiceSelect.appendChild(placeholder);
 
-				// Add new options
 				subOptions[selected].forEach(opt => {
 					const o = document.createElement("option");
 					o.value = opt.value;
@@ -224,7 +221,6 @@ document.addEventListener("DOMContentLoaded", () => {
 		});
 	}
 
-	// --- Dynamic Time Slot Logic ---
 	const dateInput = document.getElementById("date");
 	const timeSlotGroup = document.getElementById("time-slot-group");
 	const timeSelect = document.getElementById("time");

@@ -4,11 +4,13 @@ from datetime import datetime
 from functools import wraps
 from flask import Flask, request, jsonify, render_template_string, redirect, url_for, send_from_directory
 from flask_cors import CORS
+from dotenv import load_dotenv
 
-# ─── Paths ────────────────────────────────────────────────────────────────────
+load_dotenv()
+
 BASE_DIR    = os.path.dirname(os.path.abspath(__file__))
-FRONT_DIR   = os.path.join(BASE_DIR, '..')      # index.html lives here
-DATA_DIR    = os.path.join(BASE_DIR, 'data')    # all JSON data files here
+FRONT_DIR   = os.path.join(BASE_DIR, '..')    
+DATA_DIR    = os.path.join(BASE_DIR, 'data')  
 os.makedirs(DATA_DIR, exist_ok=True)
 
 BOOKINGS_FILE     = os.path.join(DATA_DIR, 'bookings.json')
@@ -16,7 +18,6 @@ BLOCKED_DAYS_FILE = os.path.join(DATA_DIR, 'blocked_days.json')
 BLOCKED_SLOTS_FILE= os.path.join(DATA_DIR, 'blocked_slots.json')
 SETTINGS_FILE     = os.path.join(DATA_DIR, 'settings.json')
 
-# ─── Config ───────────────────────────────────────────────────────────────────
 ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'rayla_admin_2026')
 
@@ -28,16 +29,21 @@ ALL_SLOTS = [
     "18:00","18:30"
 ]
 
-# ─── App ──────────────────────────────────────────────────────────────────────
-app = Flask(__name__, static_folder=FRONT_DIR, static_url_path='')
+app = Flask(__name__)
 CORS(app)
 
-# ─── Serve frontend ───────────────────────────────────────────────────────────
 @app.route('/')
 def index():
     return send_from_directory(FRONT_DIR, 'index.html')
 
-# ─── Auth ─────────────────────────────────────────────────────────────────────
+@app.route('/<path:filename>')
+def serve_static(filename):
+    if filename in ['style.css', 'script.js', 'favicon.ico']:
+        return send_from_directory(FRONT_DIR, filename)
+    if filename.startswith('images/'):
+        return send_from_directory(FRONT_DIR, filename)
+    return ('Not found', 404)
+
 def requires_auth(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -47,7 +53,6 @@ def requires_auth(f):
         return f(*args, **kwargs)
     return decorated
 
-# ─── Data helpers ─────────────────────────────────────────────────────────────
 def load_json(path):
     if os.path.exists(path):
         with open(path, 'r') as f:
@@ -70,7 +75,6 @@ def get_num_technicians():
                 pass
     return 2
 
-# ─── Public API ───────────────────────────────────────────────────────────────
 @app.route('/api/availability')
 def get_availability():
     date = request.args.get('date')
@@ -97,7 +101,6 @@ def get_availability():
         if s not in manual_blocked and slot_counts.get(s, 0) < num_tech
     ]
     return jsonify({"blocked": False, "available_slots": available})
-
 
 @app.route('/api/booking', methods=['POST'])
 def handle_booking():
@@ -135,7 +138,6 @@ def handle_booking():
         "message": f"Thank you, {name}! Your {service} appointment is confirmed for {date} at {time}."
     }), 200
 
-# ─── Admin templates ──────────────────────────────────────────────────────────
 SHARED_STYLES = """
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -313,7 +315,6 @@ BLOCKED_HTML = """<!DOCTYPE html>
 </div></body></html>
 """
 
-# ─── Admin routes ─────────────────────────────────────────────────────────────
 @app.route('/admin')
 @requires_auth
 def admin_dashboard():
@@ -391,7 +392,6 @@ def save_settings():
         save_json(SETTINGS_FILE, {'num_technicians': int(n)})
     return redirect(url_for('admin_blocked'))
 
-# ─── Run ──────────────────────────────────────────────────────────────────────
 if __name__ == '__main__':
     debug = os.environ.get('FLASK_DEBUG', 'false').lower() == 'true'
     port  = int(os.environ.get('PORT', 5000))
