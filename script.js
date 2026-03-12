@@ -163,8 +163,8 @@ document.addEventListener("DOMContentLoaded", () => {
 			);
 
 			const glowColor = isHovering
-				? "rgba(255, 140, 50, "
-				: "rgba(255, 180, 80, ";
+				? "rgba(0, 212, 255, "
+				: "rgba(161, 66, 244, ";
 
 			gradient.addColorStop(0, glowColor + circle.opacity + ")");
 			gradient.addColorStop(1, glowColor + "0)");
