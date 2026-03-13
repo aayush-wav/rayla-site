@@ -36,6 +36,7 @@
 	--color-white: #111111;
 	--color-secondary: #f8e1e1;
 	--color-secondary-light: #ffffff;
+	--color-footer-bg: #05080a; /* Deep midnight charcoal */
 	--toggle-bg: rgba(255, 255, 255, 0.1);
 	--blob-opacity: 0.35;
 	--glass-bg: rgba(255, 255, 255, 0.05); /* Slightly clearer */
@@ -264,6 +265,10 @@ img {
 	backdrop-filter: blur(5px);
 	-webkit-backdrop-filter: blur(5px);
 	border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.dark-mode .logo img {
+	background: rgba(0, 0, 0, 0.4); /* Darker logo backing for dark mode */
 }
 
 .theme-toggle {
@@ -910,6 +915,11 @@ img {
 	background-color: var(--color-secondary);
 	color: var(--color-white);
 	padding: 5rem 0 2rem;
+	transition: background-color 0.4s ease;
+}
+
+.dark-mode .footer {
+	background-color: var(--color-footer-bg);
 }
 
 .footer-content {
