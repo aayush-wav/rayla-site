@@ -177,6 +177,10 @@ img {
 	color: var(--color-secondary);
 }
 
+.dark-mode .btn-secondary {
+	color: #1a1a1a; /* Dark text for light button background in dark mode */
+}
+
 .btn-secondary:hover {
 	background-color: var(--color-primary-dark);
 	transform: translateY(-2px);
