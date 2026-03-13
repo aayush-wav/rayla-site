@@ -1,4 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
+	// Root level theme check to prevent flickering
+	const currentTheme = localStorage.getItem("theme");
+	if (currentTheme === "dark") {
+		document.body.classList.add("dark-mode");
+	}
+
 	const navbar = document.querySelector(".navbar");
 	window.addEventListener("scroll", () => {
 		if (window.scrollY > 50) {
@@ -346,8 +352,12 @@ document.addEventListener("DOMContentLoaded", () => {
 		let globalAlpha = 0; // Transition alpha
 		const lerp = (a, b, n) => (1 - n) * a + n * b;
 
-		// Force a darker monochrome (ignores dark mode to be distinct)
-		const getColor = (alpha) => `rgba(26, 26, 26, ${alpha * globalAlpha})`;
+		// Monochrome dots: darker on light mode, lighter on dark mode
+		const getColor = (alpha) => {
+			const isDark = document.body.classList.contains("dark-mode");
+			const baseColor = isDark ? "255, 255, 255" : "26, 26, 26";
+			return `rgba(${baseColor}, ${alpha * globalAlpha})`;
+		};
 
 		// 1. Grid Warp Configuration
 		const gridSpacing = 36;
@@ -440,6 +450,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		animate();
 	};
+
+	const themeToggle = document.getElementById("theme-toggle");
+	if (themeToggle) {
+		themeToggle.addEventListener("click", () => {
+			document.body.classList.toggle("dark-mode");
+			const theme = document.body.classList.contains("dark-mode") ? "dark" : "light";
+			localStorage.setItem("theme", theme);
+		});
+	}
 
 	initMonochromeCursor();
 });
