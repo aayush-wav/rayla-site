@@ -145,65 +145,104 @@ def handle_booking():
 SHARED_STYLES = """
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-    :root{--primary:#36454f;--accent:#f8e1e1;--bg:#f5f7f8;--danger:#e74c3c;--success:#27ae60}
+    :root{--primary:#36454f;--accent:#f8e1e1;--bg:#f5f7f8;--danger:#e74c3c;--success:#27ae60;--sidebar-width:240px}
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--primary)}
-    .sidebar{position:fixed;top:0;left:0;width:220px;height:100vh;background:var(--primary);color:#fff;padding:30px 20px}
-    .sidebar h2{font-family:'Playfair Display',serif;font-size:1.4rem;margin-bottom:30px}
-    .sidebar a{display:block;color:rgba(255,255,255,.7);text-decoration:none;padding:10px 12px;border-radius:8px;margin-bottom:5px;font-size:.9rem;transition:all .2s}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--primary);min-height:100vh}
+    
+    .sidebar{position:fixed;top:0;left:0;width:var(--sidebar-width);height:100vh;background:var(--primary);color:#fff;padding:30px 20px;z-index:1000;transition:transform 0.3s ease}
+    .sidebar h2{font-family:'Playfair Display',serif;font-size:1.4rem;margin-bottom:30px;display:flex;justify-content:space-between;align-items:center}
+    .sidebar .close-btn{display:none;background:none;border:none;color:#fff;font-size:1.8rem;cursor:pointer;line-height:1}
+    .sidebar a{display:block;color:rgba(255,255,255,.7);text-decoration:none;padding:12px 16px;border-radius:10px;margin-bottom:8px;font-size:.95rem;transition:all .2s;display:flex;align-items:center;gap:12px}
     .sidebar a:hover,.sidebar a.active{background:rgba(255,255,255,.15);color:#fff}
-    .main{margin-left:220px;padding:40px;transition:margin-left .3s ease}
+    
+    .main{margin-left:var(--sidebar-width);padding:40px;transition:margin-left .3s ease;min-height:100vh}
+    
+    .mobile-header{display:none;background:#fff;padding:15px 20px;position:sticky;top:0;z-index:900;box-shadow:0 2px 10px rgba(0,0,0,.05);justify-content:space-between;align-items:center}
+    .mobile-header h2{font-family:'Playfair Display',serif;font-size:1.2rem}
+    .menu-btn{background:var(--primary);color:#fff;border:none;padding:10px 15px;border-radius:8px;cursor:pointer;font-weight:600}
+    
     h1{font-family:'Playfair Display',serif;font-size:2rem;margin-bottom:30px}
-    .section{background:#fff;border-radius:14px;box-shadow:0 2px 15px rgba(0,0,0,.06);overflow:hidden;margin-bottom:30px}
-    .section-content{overflow-x:auto}
-    .section-header{padding:20px 24px;border-bottom:1px solid #f0f0f0;font-weight:600;font-size:1rem}
-    .form-row{padding:24px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-    .form-row label{font-size:.9rem;color:#666}
-    .form-row input[type=date],.form-row select,.form-row input[type=number]{padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-family:'Inter',sans-serif;font-size:.95rem}
-    .btn{padding:10px 20px;border:none;border-radius:8px;cursor:pointer;font-family:'Inter',sans-serif;font-weight:500;transition:opacity .2s;white-space:nowrap}
-    .btn:hover{opacity:.85}
+    .section{background:#fff;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,.04);overflow:hidden;margin-bottom:30px;border:1px solid rgba(0,0,0,.05)}
+    .section-header{padding:20px 24px;border-bottom:1px solid #f0f0f0;font-weight:600;font-size:1.05rem;background:#fafafa}
+    .section-content{overflow-x:auto;-webkit-overflow-scrolling:touch}
+    
+    .form-row{padding:24px;display:flex;gap:15px;align-items:center;flex-wrap:wrap}
+    .form-row label{font-size:.9rem;color:#666;font-weight:500}
+    .form-row input[type=date],.form-row select,.form-row input[type=number]{padding:12px 16px;border:1.5px solid #eee;border-radius:10px;font-family:'Inter',sans-serif;font-size:.95rem;outline:none;transition:border-color .2s;min-width:150px}
+    .form-row input:focus{border-color:var(--primary)}
+    
+    .btn{padding:12px 24px;border:none;border-radius:10px;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;transition:all .2s;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-size:.95rem}
+    .btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
     .btn-primary{background:var(--primary);color:#fff}
-    .btn-danger{background:var(--danger);color:#fff;font-size:.8rem;padding:6px 12px;border-radius:6px}
-    .btn-success{background:var(--success);color:#fff;font-size:.8rem;padding:6px 14px;border-radius:8px;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-weight:500;white-space:nowrap}
-    .btn-success:hover{opacity:.85}
-    .tag-list{display:flex;flex-wrap:wrap;gap:10px;padding:24px}
-    .tag{padding:10px 16px;border-radius:10px;display:flex;align-items:center;gap:12px;font-size:.9rem;font-weight:500}
-    .tag-day{background:#fde8e8;color:var(--danger)}
-    .tag-slot{background:#fff3cd;color:#856404}
-    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:35px}
-    .card{background:#fff;padding:24px;border-radius:14px;box-shadow:0 2px 15px rgba(0,0,0,.06)}
-    .card h3{font-size:.8rem;text-transform:uppercase;color:#999;letter-spacing:1px;margin-bottom:10px}
-    .card .value{font-size:2.2rem;font-weight:600}
-    table{width:100%;border-collapse:collapse;min-width:600px}
-    th{background:#fafafa;text-align:left;padding:12px 20px;font-size:.8rem;text-transform:uppercase;color:#999;letter-spacing:.5px}
-    td{padding:14px 20px;border-bottom:1px solid #f5f5f5;font-size:.95rem}
-    tr:last-child td{border-bottom:none}
-    .badge{padding:4px 12px;border-radius:20px;font-size:.8rem;font-weight:500}
+    .btn-danger{background:var(--danger);color:#fff;font-size:.85rem;padding:8px 16px}
+    .btn-success{background:var(--success);color:#fff;font-size:.85rem;padding:10px 20px;width:auto}
+    
+    .tag-list{display:flex;flex-wrap:wrap;gap:12px;padding:24px}
+    .tag{padding:12px 18px;border-radius:12px;display:flex;align-items:center;gap:12px;font-size:.9rem;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.02)}
+    .tag-day{background:#fff0f0;color:var(--danger);border:1px solid #ffecec}
+    .tag-slot{background:#fff9e6;color:#856404;border:1px solid #fff3cd}
+    
+    .stats{display:grid;grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));gap:25px;margin-bottom:40px}
+    .card{background:#fff;padding:28px;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.05)}
+    .card h3{font-size:.75rem;text-transform:uppercase;color:#999;letter-spacing:1.5px;margin-bottom:15px;font-weight:600}
+    .card .value{font-size:2.4rem;font-weight:700;color:var(--primary)}
+    
+    table{width:100%;border-collapse:collapse;min-width:800px}
+    th{background:#f8f9fa;text-align:left;padding:16px 24px;font-size:.75rem;text-transform:uppercase;color:#888;letter-spacing:1px;font-weight:600}
+    td{padding:18px 24px;border-bottom:1px solid #f1f1f1;font-size:.95rem}
+    tr:hover td{background:#fafafa}
+    
+    .badge{padding:6px 14px;border-radius:20px;font-size:.8rem;font-weight:600}
     .badge-service{background:var(--accent);color:var(--primary)}
-    .time-badge{background:#e8f4fd;color:#2980b9;padding:3px 10px;border-radius:6px;font-size:.85rem;font-weight:500}
-    .empty{padding:30px 24px;color:#aaa;font-style:italic}
-    .note{padding:14px 24px;background:#fffbeb;border-left:4px solid #f59e0b;color:#92400e;font-size:.88rem}
-    .page-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;flex-wrap:wrap;gap:15px}
-    @media (max-width:992px){
-        .sidebar{width:60px;padding:30px 10px}
-        .sidebar h2{display:none}
-        .sidebar a{text-align:center;font-size:1.2rem;padding:15px 0}
-        .main{margin-left:60px;padding:20px}
+    .time-badge{background:#eef7ff;color:#2980b9;padding:5px 12px;border-radius:8px;font-size:.85rem;font-weight:600}
+    
+    .empty{padding:50px 24px;text-align:center;color:#aaa;font-style:italic}
+    .note{padding:16px 24px;background:#fff9eb;border-left:5px solid #f59e0b;color:#92400e;font-size:.9rem;line-height:1.5;margin:10px 24px 0}
+    .page-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;flex-wrap:wrap;gap:20px}
+
+    .sidebar-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:950;backdrop-filter:blur(2px)}
+    .sidebar-overlay.active{display:block}
+
+    @media (max-width:1024px){
+        .sidebar{transform:translateX(-100%)}
+        .sidebar.active{transform:translateX(0)}
+        .sidebar .close-btn{display:block}
+        .main{margin-left:0;padding:25px 20px}
+        .mobile-header{display:flex}
     }
+    
     @media (max-width:768px){
+        h1{font-size:1.75rem}
         .stats{grid-template-columns:1fr}
-        h1{font-size:1.5rem}
+        .page-header{flex-direction:column;align-items:flex-start}
+        .page-header button{width:100%}
+        .form-row{flex-direction:column;align-items:stretch}
+        .form-row input, .form-row select, .form-row button{width:100% !important}
+        .card .value{font-size:2rem}
     }
 </style>
+<script>
+    function toggleSidebar() {
+        document.querySelector('.sidebar').classList.toggle('active');
+        document.querySelector('.sidebar-overlay').classList.toggle('active');
+    }
+</script>
 """
 
+
 SIDEBAR_BOOKINGS = """
+<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
 <div class="sidebar">
-    <h2>Rayla Admin</h2>
+    <h2>Rayla Admin <button class="close-btn" onclick="toggleSidebar()">&times;</button></h2>
     <a href="/admin" class="{a}">📋 Bookings</a>
     <a href="/admin/blocked" class="{b}">🚫 Availability</a>
 </div>
+<div class="mobile-header">
+    <h2>Rayla Admin</h2>
+    <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
+</div>
 """
+
 
 ADMIN_HTML = """<!DOCTYPE html>
 <html lang="en">
@@ -220,7 +259,7 @@ ADMIN_HTML = """<!DOCTYPE html>
     <div class="stats">
         <div class="card"><h3>Appointments</h3><div class="value">{{ total }}</div></div>
         <div class="card"><h3>Technicians</h3><div class="value">{{ num_tech }}</div></div>
-        <div class="card"><h3>Availability</h3><div class="value" style="font-size:1.2rem;line-height:1.4">{{ blocked_days }} Days Blocked<br>{{ blocked_slots }} Slots Blocked</div></div>
+        <div class="card"><h3>Blocked</h3><div class="value" style="font-size:1.1rem;line-height:1.6;font-weight:600">{{ blocked_days }} Days<br>{{ blocked_slots }} Slots</div></div>
     </div>
     <div class="section">
         <div class="section-header">All Appointments</div>
@@ -235,14 +274,14 @@ ADMIN_HTML = """<!DOCTYPE html>
                 <tr>
                     <td style="color:#aaa;font-size:.85rem">{{ b.timestamp }}</td>
                     <td><strong>{{ b.name }}</strong></td>
-                    <td>{{ b.phone if b.phone else b.email if b.email else '—' }}</td>
+                    <td><a href="tel:{{ b.phone }}" style="color:inherit;text-decoration:none">{{ b.phone if b.phone else '—' }}</a></td>
                     <td><span class="badge badge-service">{{ b.service }}</span></td>
-                    <td style="color:#555;font-style:italic">{{ b.sub_service if b.sub_service else '—' }}</td>
-                    <td>{{ b.date }}</td>
+                    <td style="color:#555;font-style:italic;font-size:.9rem">{{ b.sub_service if b.sub_service else '—' }}</td>
+                    <td><span style="white-space:nowrap">{{ b.date }}</span></td>
                     <td><span class="time-badge">{{ b.time if b.time else '—' }}</span></td>
                     <td>
                         <form action="/admin/complete" method="POST"
-                               onsubmit="return confirm('Mark appointment as complete and remove it?')">
+                                onsubmit="return confirm('Mark appointment as complete and remove it?')">
                             <input type="hidden" name="timestamp" value="{{ b.timestamp }}">
                             <button type="submit" class="btn-success">✓ Done</button>
                         </form>
@@ -257,6 +296,7 @@ ADMIN_HTML = """<!DOCTYPE html>
     </div>
 </div></body></html>
 """
+
 
 BLOCKED_HTML = """<!DOCTYPE html>
 <html lang="en">
@@ -274,7 +314,7 @@ BLOCKED_HTML = """<!DOCTYPE html>
         <form class="form-row" action="/admin/settings" method="POST">
             <label>Active Technicians:</label>
             <input type="number" name="num_technicians" value="{{ num_tech }}" min="1" max="10" style="width:80px">
-            <button type="submit" class="btn btn-primary">Save</button>
+            <button type="submit" class="btn btn-primary">Save Settings</button>
         </form>
     </div>
 
@@ -307,10 +347,10 @@ BLOCKED_HTML = """<!DOCTYPE html>
         {% if blocked_days %}
         <div class="tag-list">
             {% for d in blocked_days %}
-            <div class="tag tag-day">📅 {{ d }}
+            <div class="tag tag-day"><span>📅</span> {{ d }}
                 <form action="/admin/unblock" method="POST" style="display:inline">
                     <input type="hidden" name="date" value="{{ d }}">
-                    <button type="submit" class="btn btn-danger">Unblock</button>
+                    <button type="submit" class="btn-danger">Unblock</button>
                 </form>
             </div>{% endfor %}
         </div>
@@ -322,10 +362,10 @@ BLOCKED_HTML = """<!DOCTYPE html>
         {% if blocked_slots %}
         <div class="tag-list">
             {% for s in blocked_slots %}
-            <div class="tag tag-slot">🕐 {{ s }}
+            <div class="tag tag-slot"><span>🕐</span> {{ s }}
                 <form action="/admin/unblock-slot" method="POST" style="display:inline">
                     <input type="hidden" name="slot" value="{{ s }}">
-                    <button type="submit" class="btn btn-danger">Unblock</button>
+                    <button type="submit" class="btn-danger">Unblock</button>
                 </form>
             </div>{% endfor %}
         </div>
@@ -333,6 +373,7 @@ BLOCKED_HTML = """<!DOCTYPE html>
     </div>
 </div></body></html>
 """
+
 
 @app.route('/admin')
 @requires_auth
