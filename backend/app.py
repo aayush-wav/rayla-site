@@ -208,6 +208,7 @@ SIDEBAR_BOOKINGS = """
 ADMIN_HTML = """<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"><title>Rayla Admin | Bookings</title>
+<link rel="icon" type="image/jpeg" href="/images/favicon.jpg">
 """ + SHARED_STYLES + """
 </head><body>
 """ + SIDEBAR_BOOKINGS.format(a='active', b='') + """
@@ -241,7 +242,7 @@ ADMIN_HTML = """<!DOCTYPE html>
                     <td><span class="time-badge">{{ b.time if b.time else '—' }}</span></td>
                     <td>
                         <form action="/admin/complete" method="POST"
-                              onsubmit="return confirm('Mark appointment as complete and remove it?')">
+                               onsubmit="return confirm('Mark appointment as complete and remove it?')">
                             <input type="hidden" name="timestamp" value="{{ b.timestamp }}">
                             <button type="submit" class="btn-success">✓ Done</button>
                         </form>
@@ -260,6 +261,7 @@ ADMIN_HTML = """<!DOCTYPE html>
 BLOCKED_HTML = """<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"><title>Rayla Admin | Availability</title>
+<link rel="icon" type="image/jpeg" href="/images/favicon.jpg">
 """ + SHARED_STYLES + """
 </head><body>
 """ + SIDEBAR_BOOKINGS.format(a='', b='active') + """
@@ -428,4 +430,7 @@ if __name__ == '__main__':
             serve(app, host='0.0.0.0', port=port)
         except ImportError:
             print("waitress not installed, falling back to Flask dev server.")
+            app.run(host='0.0.0.0', port=port)
+        except Exception as e:
+            print(f"Error starting server: {e}")
             app.run(host='0.0.0.0', port=port)

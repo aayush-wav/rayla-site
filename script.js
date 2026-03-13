@@ -139,7 +139,6 @@ document.addEventListener("DOMContentLoaded", () => {
 				i++;
 				setTimeout(typeWriter, 120);
 			} else {
-				
 				startCursor();
 			}
 		};
@@ -165,34 +164,33 @@ document.addEventListener("DOMContentLoaded", () => {
 			{ value: "acrylic", text: "Acrylic (NPR 1800)" },
 			{ value: "polygel", text: "Polygel (NPR 1500)" },
 			{ value: "overlay", text: "Overlay (NPR 1000)" },
-			{ value: "choose-on-visit", text: "Choose on Visit" }
+			{ value: "choose-on-visit", text: "Choose on Visit" },
 		],
 		"lash-extensions": [
 			{ value: "classic", text: "Classic Lashes (NPR 1500)" },
 			{ value: "cateye", text: "Cateye Lashes (NPR 1800)" },
 			{ value: "wispy", text: "Wispy Lashes (NPR 2000)" },
 			{ value: "lift", text: "Lashes Lift (NPR 1500)" },
-			{ value: "choose-on-visit", text: "Choose on Visit" }
+			{ value: "choose-on-visit", text: "Choose on Visit" },
 		],
-		"removal": [
+		removal: [
 			{ value: "nail-removal", text: "Nail Extension Removal (NPR 500)" },
 			{ value: "lash-removal", text: "Lash Extension Removal (NPR 700)" },
-			{ value: "choose-on-visit", text: "Choose on Visit" }
+			{ value: "choose-on-visit", text: "Choose on Visit" },
 		],
-		"courses": [
+		courses: [
 			{ value: "nail-basic", text: "Nail Basic (NPR 10,000)" },
 			{ value: "nail-pro", text: "Nail Professional (NPR 33,000)" },
 			{ value: "lash-basic", text: "Lash Basic (NPR 5,000)" },
 			{ value: "lash-pro", text: "Lash Professional (NPR 16,000)" },
-			{ value: "choose-on-visit", text: "Talk to Expert on Visit" }
-		]
+			{ value: "choose-on-visit", text: "Talk to Expert on Visit" },
+		],
 	};
 
 	if (serviceSelect) {
 		serviceSelect.addEventListener("change", () => {
 			const selected = serviceSelect.value;
 			if (subOptions[selected]) {
-				
 				subServiceSelect.innerHTML = "";
 
 				const placeholder = document.createElement("option");
@@ -202,7 +200,7 @@ document.addEventListener("DOMContentLoaded", () => {
 				placeholder.textContent = "Select specific type...";
 				subServiceSelect.appendChild(placeholder);
 
-				subOptions[selected].forEach(opt => {
+				subOptions[selected].forEach((opt) => {
 					const o = document.createElement("option");
 					o.value = opt.value;
 					o.textContent = opt.text;
@@ -227,7 +225,8 @@ document.addEventListener("DOMContentLoaded", () => {
 			const selectedDate = dateInput.value;
 			if (!selectedDate) return;
 
-			timeSelect.innerHTML = '<option value="" disabled selected>Loading slots...</option>';
+			timeSelect.innerHTML =
+				'<option value="" disabled selected>Loading slots...</option>';
 			timeSlotGroup.style.display = "block";
 			timeSelect.required = true;
 
@@ -268,7 +267,8 @@ document.addEventListener("DOMContentLoaded", () => {
 				}
 			} catch (err) {
 				console.error("Availability Fetch Error:", err);
-				timeSelect.innerHTML = '<option value="" disabled selected>Could not load slots</option>';
+				timeSelect.innerHTML =
+					'<option value="" disabled selected>Could not load slots</option>';
 			}
 		});
 	}
@@ -322,4 +322,125 @@ document.addEventListener("DOMContentLoaded", () => {
 	};
 
 	initInstagram();
+
+	// --- Monochrome Cursor Overlay & Grid Warp ---
+	const initMonochromeCursor = () => {
+		const canvas = document.getElementById("cursor-canvas");
+		const hero = document.querySelector(".hero");
+		if (!canvas || !hero) return;
+
+		const ctx = canvas.getContext("2d");
+		let width, height;
+		
+		const resize = () => {
+			width = window.innerWidth;
+			height = window.innerHeight;
+			canvas.width = width;
+			canvas.height = height;
+		};
+		window.addEventListener("resize", resize);
+		resize();
+
+		const pos = { x: width / 2, y: height / 2 };
+		let velocity = 0;
+		let warpStrength = 0;
+		let globalAlpha = 0; // Transition alpha
+		const lerp = (a, b, n) => (1 - n) * a + n * b;
+
+		// Force a darker monochrome (ignores dark mode to be distinct)
+		const getColor = (alpha) => `rgba(26, 26, 26, ${alpha * globalAlpha})`;
+
+		// 1. Grid Warp Configuration
+		const gridSpacing = 36;
+		const influenceRadius = 140; // Increased influence radius
+		const mouse = { x: width / 2, y: height / 2, lastX: width / 2, lastY: height / 2, active: false };
+
+		const updatePosition = (e) => {
+			mouse.x = e.clientX;
+			mouse.y = e.clientY;
+			
+			const rect = hero.getBoundingClientRect();
+			mouse.active = (
+				mouse.x >= rect.left && 
+				mouse.x <= rect.right && 
+				mouse.y >= rect.top && 
+				mouse.y <= rect.bottom
+			);
+		};
+
+		window.addEventListener("mousemove", updatePosition);
+		window.addEventListener("scroll", () => {
+			updatePosition({ clientX: mouse.x, clientY: mouse.y });
+		});
+
+		window.addEventListener("mouseleave", () => {
+			velocity = 0;
+			warpStrength = 0;
+			mouse.active = false;
+		});
+
+		const animate = () => {
+			// Calculate velocity
+			const dx = mouse.x - mouse.lastX;
+			const dy = mouse.y - mouse.lastY;
+			const instantVel = Math.sqrt(dx * dx + dy * dy);
+			velocity = lerp(velocity, instantVel, 0.1);
+			warpStrength = lerp(warpStrength, Math.min(velocity * 0.2, 3.5), 0.1); // Increased multiplier and cap
+			
+			// Handle smooth transition when entering/leaving hero
+			globalAlpha = lerp(globalAlpha, mouse.active ? 1 : 0, 0.1);
+
+			mouse.lastX = mouse.x;
+			mouse.lastY = mouse.y;
+
+			ctx.clearRect(0, 0, width, height);
+
+			const heroRect = hero.getBoundingClientRect();
+			const isInView = heroRect.bottom > 0 && heroRect.top < height;
+
+			if (!isInView && globalAlpha < 0.01) {
+				requestAnimationFrame(animate);
+				return;
+			}
+
+			// --- Layer 1: Grid Warp (Background dots) ---
+			// We draw these dots even if not hovering, as long as hero is in view
+			const startCol = 0;
+			const endCol = Math.ceil(width / gridSpacing);
+			const startRow = Math.max(0, Math.floor(heroRect.top / gridSpacing));
+			const endRow = Math.min(Math.ceil(height / gridSpacing), Math.ceil(heroRect.bottom / gridSpacing));
+			
+			for (let i = startCol; i <= endCol; i++) {
+				for (let j = startRow; j <= endRow; j++) {
+					let x = i * gridSpacing;
+					let y = j * gridSpacing;
+
+					const distDx = x - mouse.x;
+					const distDy = y - mouse.y;
+					const dist = Math.sqrt(distDx * distDx + distDy * distDy);
+
+					if (dist < influenceRadius && globalAlpha > 0.01) {
+						// Radial bulge distortion away from cursor - only when hovering
+						const force = (1 - dist / influenceRadius) ** 2;
+						const angle = Math.atan2(distDy, distDx);
+						const shift = force * warpStrength * 24 * globalAlpha; // Increased shift multiplier
+						x += Math.cos(angle) * shift;
+						y += Math.sin(angle) * shift;
+					}
+
+					ctx.beginPath();
+					ctx.arc(x, y, 1.2, 0, Math.PI * 2); 
+					// Base alpha for dots is 0.2, increasing slightly on hover
+					ctx.fillStyle = `rgba(30, 30, 30, ${0.2 + (0.3 * globalAlpha)})`;
+					ctx.fill();
+				}
+			}
+
+			requestAnimationFrame(animate);
+		};
+
+		animate();
+	};
+
+	initMonochromeCursor();
 });
