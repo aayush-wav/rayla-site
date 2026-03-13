@@ -1138,11 +1138,11 @@ img {
 	font-family: var(--font-heading);
 	font-size: 1.8rem;
 	margin-bottom: 1rem;
-	color: var(--color-secondary);
+	color: #5D6266; /* Stone Grey */
 }
 
 .location-card p {
-	color: var(--color-text-light);
+	color: #5D6266; /* Stone Grey */
 	margin-bottom: 2rem;
 	line-height: 1.6;
 }
