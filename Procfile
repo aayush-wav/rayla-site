@@ -1,2 +1,1 @@
-# For Railway / Render / Fly.io
-web: python backend/app.py
+web: gunicorn --chdir backend app:app --bind 0.0.0.0:$PORT

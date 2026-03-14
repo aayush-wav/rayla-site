@@ -461,17 +461,4 @@ def save_settings():
 if __name__ == '__main__':
     debug = os.environ.get('FLASK_DEBUG', 'false').lower() == 'true'
     port  = int(os.environ.get('PORT', 5000))
-
-    if debug:
-        app.run(debug=True, port=port)
-    else:
-        try:
-            from waitress import serve
-            print(f"Starting production server on http://0.0.0.0:{port}")
-            serve(app, host='0.0.0.0', port=port)
-        except ImportError:
-            print("waitress not installed, falling back to Flask dev server.")
-            app.run(host='0.0.0.0', port=port)
-        except Exception as e:
-            print(f"Error starting server: {e}")
-            app.run(host='0.0.0.0', port=port)
+    app.run(debug=debug, host='0.0.0.0', port=port)
