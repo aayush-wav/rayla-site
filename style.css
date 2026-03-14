@@ -134,6 +134,7 @@ img {
 	max-width: 1200px;
 	margin: 0 auto;
 	padding: 0 2rem;
+	width: 100%;
 }
 
 .btn {
@@ -606,8 +607,8 @@ img {
 
 .menu-grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-	gap: 4rem;
+	grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+	gap: 2.5rem;
 	position: relative;
 	z-index: 2;
 }
@@ -701,7 +702,7 @@ img {
 
 .gallery-grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
 	gap: 1.5rem;
 }
 
@@ -798,8 +799,8 @@ img {
 
 .reviews-grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-	gap: 2rem;
+	grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+	gap: 1.5rem;
 }
 
 .review-card {
@@ -991,7 +992,7 @@ img {
 	width: 100%;
 	max-width: 1400px;
 	margin: 4rem auto 0;
-	padding: 0 4rem;
+	padding: 0 2rem;
 }
 
 .instagram-profile-header {
@@ -1083,7 +1084,7 @@ img {
 		grid-template-columns: repeat(2, 1fr);
 	}
 	.instagram-container {
-		padding: 0 1.5rem;
+		padding: 0 1rem;
 	}
 }
 
@@ -1168,9 +1169,10 @@ img {
 		top: auto;
 		left: auto;
 		transform: none;
-		margin: 2rem;
+		margin: 1.5rem;
 		max-width: none;
 		text-align: center;
+		padding: 2rem 1.5rem;
 	}
 	.location-section {
 		height: auto;
@@ -1178,7 +1180,7 @@ img {
 		flex-direction: column-reverse;
 	}
 	.map-wrapper {
-		height: 400px;
+		height: 350px;
 	}
 }
 
@@ -1213,6 +1215,9 @@ img {
 	transform: translateY(-5px);
 }
 
+/* ============================================
+   TABLET (≤900px)
+   ============================================ */
 @media (max-width: 900px) {
 	.about-grid,
 	.booking-container {
@@ -1232,26 +1237,62 @@ img {
 	.footer-social a:hover {
 		transform: none;
 	}
-}
 
-@media (max-width: 600px) {
-	.hero::after {
-		background-size: 80%;
-		background-position: center 70%;
+	.menu-section {
+		padding: 5rem 0;
+	}
+
+	.booking {
+		padding: 5rem 0;
+	}
+
+	.about {
+		padding: 5rem 0;
+	}
+
+	.gallery {
+		padding: 5rem 0;
+	}
+
+	.reviews {
+		padding: 5rem 0;
+	}
+
+	.instagram-section {
+		padding: 5rem 0;
+	}
+
+	.booking-container {
+		padding: 2.5rem;
+		gap: 2.5rem;
 	}
 }
 
+/* ============================================
+   MOBILE (≤768px)
+   ============================================ */
 @media (max-width: 768px) {
 	.hero h1 {
-		font-size: 3.5rem;
-		letter-spacing: -1px;
+		font-size: 2.8rem;
+		letter-spacing: -0.5px;
 		margin-bottom: 1.5rem;
 	}
 	h1 {
-		font-size: 3rem;
+		font-size: 2.5rem;
 	}
 	h2 {
-		font-size: 2rem;
+		font-size: 1.8rem;
+	}
+	h3 {
+		font-size: 1.3rem;
+	}
+
+	.container {
+		padding: 0 1.25rem;
+	}
+
+	.section-header {
+		margin-bottom: 2.5rem;
 	}
 
 	.desktop-cta {
@@ -1261,7 +1302,11 @@ img {
 	.mobile-controls {
 		display: flex;
 		align-items: center;
-		gap: 1rem;
+		gap: 0.75rem;
+	}
+
+	.navbar {
+		padding: 1rem 4%;
 	}
 
 	.nav-links {
@@ -1272,12 +1317,13 @@ img {
 		left: 0;
 		width: 100%;
 		background-color: var(--color-white);
-		padding: 2rem;
+		padding: 1.5rem;
 		text-align: center;
 		box-shadow: 0 10px 15px rgba(0, 0, 0, 0.05);
 		transform: translateY(-20px);
 		opacity: 0;
 		transition: var(--transition-smooth);
+		gap: 0.5rem;
 	}
 
 	.nav-links.active {
@@ -1290,11 +1336,195 @@ img {
 		display: block;
 	}
 
+	/* Sections */
+	.menu-section {
+		padding: 4rem 0;
+	}
+
+	.gallery {
+		padding: 4rem 0;
+	}
+
+	.about {
+		padding: 4rem 0;
+	}
+
+	.reviews {
+		padding: 4rem 0;
+	}
+
+	.booking {
+		padding: 4rem 0;
+	}
+
+	.instagram-section {
+		padding: 4rem 0;
+	}
+
+	/* Menu */
+	.menu-grid {
+		gap: 1.5rem;
+	}
+
+	.menu-category {
+		padding: 1.75rem;
+	}
+
+	.menu-category h3 {
+		font-size: 1.4rem;
+	}
+
+	/* Gallery */
+	.gallery-grid {
+		grid-template-columns: 1fr 1fr;
+		gap: 0.75rem;
+	}
+
+	/* Booking */
+	.booking-container {
+		padding: 1.75rem;
+		gap: 2rem;
+	}
+
+	/* Footer */
+	.footer {
+		padding: 3.5rem 0 2rem;
+	}
+}
+
+/* ============================================
+   SMALL PHONES (≤480px)
+   ============================================ */
+@media (max-width: 480px) {
+	.hero::after {
+		background-size: 90%;
+		background-position: center 65%;
+	}
+
+	.typewriter-container {
+		font-size: clamp(2rem, 10vw, 3rem);
+	}
+
+	h1 {
+		font-size: 2rem;
+	}
+	h2 {
+		font-size: 1.6rem;
+	}
+
+	.container {
+		padding: 0 1rem;
+	}
+
+	.section-header {
+		margin-bottom: 2rem;
+	}
+
+	.menu-section {
+		padding: 3rem 0;
+	}
+
+	.gallery {
+		padding: 3rem 0;
+	}
+
+	.about {
+		padding: 3rem 0;
+	}
+
+	.reviews {
+		padding: 3rem 0;
+	}
+
+	.booking {
+		padding: 3rem 0;
+	}
+
+	.instagram-section {
+		padding: 3rem 0;
+	}
+
+	.menu-category {
+		padding: 1.25rem;
+	}
+
+	.menu-category h3 {
+		font-size: 1.25rem;
+	}
+
+	.menu-list li {
+		margin-bottom: 0.9rem;
+	}
+
+	.item-name {
+		font-size: 0.95rem;
+	}
+
+	.item-price {
+		font-size: 0.9rem;
+		white-space: nowrap;
+	}
+
 	.gallery-grid {
 		grid-template-columns: 1fr;
+		gap: 0.75rem;
 	}
 
 	.booking-container {
-		padding: 2rem;
+		padding: 1.25rem;
+		gap: 1.5rem;
+		border-radius: 16px;
+	}
+
+	.review-card {
+		padding: 1.75rem 1.25rem;
+	}
+
+	.instagram-container {
+		padding: 0 0.75rem;
+	}
+
+	.instagram-grid {
+		gap: 0.5rem;
+	}
+
+	.location-card {
+		margin: 1rem;
+		padding: 1.5rem 1.25rem;
+	}
+
+	.map-wrapper {
+		height: 280px;
+	}
+
+	.footer-content {
+		gap: 2rem;
+	}
+
+	.btn {
+		padding: 0.85rem 1.5rem;
+		font-size: 0.9rem;
+	}
+
+	.back-to-top {
+		bottom: 20px;
+		right: 20px;
+		width: 42px;
+		height: 42px;
+		font-size: 1.2rem;
+	}
+
+	.logo a {
+		font-size: 1.5rem;
+	}
+
+	.logo img {
+		height: 32px;
+		width: 32px;
+	}
+
+	.theme-toggle {
+		width: 34px;
+		height: 34px;
 	}
 }
